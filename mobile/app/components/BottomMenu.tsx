@@ -1,104 +1,165 @@
-// components/BottomMenu.tsx
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: string }) {
   return (
-    <View style={styles.container}>
-      <Link href="/screens/HomeScreen" asChild>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather
-            name="home"
-            size={24}
-            color={activeScreen === "home" ? "#139C8B" : "#9CA3AF"}
-          />
-          <Text style={[
-            styles.menuItemText,
-            activeScreen === "home" && styles.menuItemTextActive
-          ]}>
-            Home
-          </Text>
-        </TouchableOpacity>
-      </Link>
+    <View style={styles.wrapper}>
+      <LinearGradient
+        colors={['#9affe6ec', '#cffeecec', '#9affe6ec']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.container}
+      >
+        <Link href="/screens/HomeScreen" asChild>
+          <TouchableOpacity style={styles.menuItem}>
+            <View style={[
+              styles.iconContainer,
+              activeScreen === "home" && styles.activeIconContainer
+            ]}>
+              <Feather
+                name="home"
+                size={20}
+                color={activeScreen === "home" ? "#fefefe":"#0bac9e"}
+              />
+            <Text style={[
+              styles.menuItemText,
+              activeScreen === "home" && styles.menuItemTextActive
+            ]}>
+              Home
+            </Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
 
-      <Link href="/screens/EntryScreen" asChild>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather
-            name="plus"
-            size={24}
-            color={activeScreen === "entry" ? "#139C8B" : "#9CA3AF"}
-          />
-          <Text style={[
-            styles.menuItemText,
-            activeScreen === "entry" && styles.menuItemTextActive
-          ]}>
-            Entry
-          </Text>
-        </TouchableOpacity>
-      </Link>
+        <Link href="/screens/EntryScreen" asChild>
+          <TouchableOpacity style={styles.menuItem}>
+            <View style={[
+              styles.iconContainer,
+              activeScreen === "entry" && styles.activeIconContainer
+            ]}>
+              <Feather
+                name="calendar"
+                size={20}
+                color={activeScreen === "entry" ? "#fefefe":"#0bac9e"}
+              />
+            <Text style={[
+              styles.menuItemText,
+              activeScreen === "entry" && styles.menuItemTextActive
+            ]}>
+              Entry
+            </Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
 
-      <Link href="/screens/ReportScreen" asChild>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather
-            name="file-text"
-            size={24}
-            color={activeScreen === "report" ? "#139C8B" : "#9CA3AF"}
-          />
-          <Text style={[
-            styles.menuItemText,
-            activeScreen === "report" && styles.menuItemTextActive
-          ]}>
-            Report
-          </Text>
-        </TouchableOpacity>
-      </Link>
+        <Link href="/screens/ReportScreen" asChild>
+          <TouchableOpacity style={styles.menuItem}>
+            <View style={[
+              styles.iconContainer,
+              activeScreen === "report" && styles.activeIconContainer
+            ]}>
+              <Feather
+                name="bar-chart"
+                size={20}
+                color={activeScreen === "report" ?  "#fefefe":"#0bac9e"}
+              />
+            <Text style={[
+              styles.menuItemText,
+              activeScreen === "report" && styles.menuItemTextActive
+            ]}>
+              Reports
+            </Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
 
-      <Link href="/screens/DetailsScreen" asChild>
-        <TouchableOpacity style={styles.menuItem}>
-          <Feather
-            name="user"
-            size={24}
-            color={activeScreen === "details" ? "#139C8B" : "#9CA3AF"}
-          />
-          <Text style={[
-            styles.menuItemText,
-            activeScreen === "details" && styles.menuItemTextActive
-          ]}>
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </Link>
+        <Link href="/screens/DetailsScreen" asChild>
+          <TouchableOpacity style={styles.menuItem}>
+            <View style={[
+              styles.iconContainer,
+              activeScreen === "details" && styles.activeIconContainer
+            ]}>
+              <Feather
+                name="settings"
+                size={20}
+                color={activeScreen === "details" ? "#fefefe":"#0bac9e"}
+              />
+              
+            <Text style={[
+              styles.menuItemText,
+              activeScreen === "details" && styles.menuItemTextActive
+            ]}>
+              Profile
+            </Text>
+            </View>
+          </TouchableOpacity>
+        </Link>
+      </LinearGradient>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    width:"100%",
+    alignItems: "center",
+  },
   container: {
     flexDirection: "row",
     justifyContent: "space-around",
-    alignSelf:"center",
-    paddingVertical: 8,
-    backgroundColor: "white",
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-    position: "absolute",
-    width: "95%",
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
     borderRadius: 50,
-    bottom: 16,
-    left: 0,
-    right: 0,
+    height: 60,
+    width:"95%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
   },
   menuItem: {
+    flexDirection:"row",
     alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  iconContainer: {
+    paddingVertical: 12,
     paddingHorizontal: 16,
+    borderRadius: 50,
+    gap: 4,
+    flexDirection:"row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  activeIconContainer: {
+    backgroundColor: "#0bac9e",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   menuItemText: {
-    color: "#9CA3AF",
-    fontSize: 12,
-    marginTop: 4,
+    display: "none"
   },
   menuItemTextActive: {
-    color: "#139C8B",
+    color: "#ffffff",
+    display:"contents",
+    fontWeight: "600",
   },
 });

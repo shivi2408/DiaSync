@@ -35,7 +35,7 @@ export default function HomeScreen() {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setLocation("Location permission denied");
+        setLocation("Permission denied");
         return;
       }
 
@@ -193,7 +193,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
   },
   userInfo: {
     flexDirection: "row",
@@ -240,20 +239,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderWidth: 1,
     borderColor: "#e0f2fe",
-    marginBottom: 24,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     paddingVertical: 4,
-    marginLeft: 8,
     color: "#374151",
   },
   micButton: {
     backgroundColor: "#075985",
     borderRadius: 8,
     padding: 8,
-    marginLeft: 12,
   },
   section: {
     gap: 16,
