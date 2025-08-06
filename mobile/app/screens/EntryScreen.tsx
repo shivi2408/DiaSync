@@ -194,7 +194,6 @@ const styles = StyleSheet.create({
   cardSubtitle: {
     fontSize: 16,
     color: "#4b5563",
-    marginBottom: 10,
   },
   inputGroup: {
     gap: 8,
@@ -223,7 +222,6 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   addInsulinButton: {
-    marginLeft: "auto",
     padding: 8,
     borderRadius: 8,
     backgroundColor: "#e0f2fe",
@@ -235,7 +233,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0f2fe",
     gap: 12,
-    marginTop: 10,
   },
   insulinCardHeader: {
     flexDirection: "row",
@@ -269,7 +266,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 50,
     alignItems: "center",
-    marginTop: 20,
   },
   submitButtonText: {
     color: "white",

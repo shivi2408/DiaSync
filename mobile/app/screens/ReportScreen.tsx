@@ -150,81 +150,57 @@ export default function ReportScreen() {
             </View>
 
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Detailed Entries</Text>
-              <View style={styles.tableHeader}>
-                <Text style={[styles.tableHeaderText, { flex: 2 }]}>Date</Text>
-                <Text style={[styles.tableHeaderText, { flex: 1.5 }]}>
-                  Time
-                </Text>
-                <Text style={[styles.tableHeaderText, { flex: 2 }]}>
-                  Blood Sugar
-                </Text>
-                <Text style={[styles.tableHeaderText, { flex: 2 }]}>
-                  Insulin
-                </Text>
-              </View>
-              {currentMonthData.detailedEntries.length > 0 ? (
-                currentMonthData.detailedEntries.map((entry, index) => (
-                  <View key={index} style={styles.tableRow}>
-                    <View style={[styles.tableCell, { flex: 2 }]}>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: "#4b5563",
-                          textAlign: "center",
-                        }}>
-                        {entry.date}
-                      </Text>
-                    </View>
-                    <View style={[styles.tableCell, { flex: 1.5 }]}>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: "#4b5563",
-                          textAlign: "center",
-                        }}>
-                        {entry.time}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.tableCell,
-                        {
-                          flex: 2,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: 4,
-                        },
-                      ]}>
-                      <Text style={{ fontSize: 14, color: "#4b5563" }}>
-                        {entry.bloodSugar}
-                      </Text>
-                      <View
-                        style={[
-                          styles.statusBadge,
-                          entry.status === "Normal"
-                            ? styles.statusNormal
-                            : entry.status === "High"
-                            ? styles.statusHigh
-                            : styles.statusLow,
-                        ]}>
-                        <Text style={styles.statusBadgeText}>
-                          {entry.status}
-                        </Text>
-                      </View>
-                    </View>
-                    <View style={[styles.tableCell, { flex: 2 }]}>
-                      <Text style={styles.insulinName}>{entry.insulin}</Text>
-                      <Text style={styles.insulinUnits}>{entry.units}</Text>
-                    </View>
-                  </View>
-                ))
-              ) : (
-                <Text style={styles.noEntriesText}>
-                  No entries for this month.
-                </Text>
-              )}
-            </View>
+  <Text style={styles.cardTitle}>Detailed Entries</Text>
+  <View style={styles.tableHeader}>
+    <View style={styles.tableHeaderCell}>
+      <Text style={styles.tableHeaderText}>Date</Text>
+    </View>
+    <View style={styles.tableHeaderCell}>
+      <Text style={styles.tableHeaderText}>Time</Text>
+    </View>
+    <View style={styles.tableHeaderCell}>
+      <Text style={styles.tableHeaderText}>Blood Sugar</Text>
+    </View>
+    <View style={styles.tableHeaderCell}>
+      <Text style={styles.tableHeaderText}>Insulin</Text>
+    </View>
+  </View>
+
+  {currentMonthData.detailedEntries.length > 0 ? (
+    currentMonthData.detailedEntries.map((entry, index) => (
+      <View key={index} style={styles.tableRow}>
+        <View style={styles.tableCell}>
+          <Text style={styles.tableCellText}>{entry.date}</Text>
+        </View>
+        <View style={styles.tableCell}>
+          <Text style={styles.tableCellText}>{entry.time}</Text>
+        </View>
+        <View style={[styles.tableCell, { flexDirection: "row", gap: 4 }]}>
+          <Text style={styles.tableCellText}>{entry.bloodSugar}</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              entry.status === "Normal"
+                ? styles.statusNormal
+                : entry.status === "High"
+                ? styles.statusHigh
+                : styles.statusLow,
+            ]}
+          >
+            <Text style={styles.statusBadgeText}>{entry.status}</Text>
+          </View>
+        </View>
+        <View style={styles.tableCell}>
+          <Text style={styles.insulinName}>{entry.insulin}</Text>
+          <Text style={styles.insulinUnits}>{entry.units}</Text>
+        </View>
+      </View>
+    ))
+  ) : (
+    <Text style={styles.noEntriesText}>No entries for this month.</Text>
+  )}
+</View>
+
           </>
         )}
         {/* Placeholder for Entry and History tabs if they were to be implemented here */}
@@ -354,7 +330,7 @@ const styles = StyleSheet.create({
   },
   downloadButton: {
     backgroundColor: "#139C8B",
-    padding: 16,
+    padding: 10,
     borderRadius: 50,
     alignItems: "center",
     flexDirection: "row",
@@ -368,12 +344,14 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: "row",
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0f2fe",
     backgroundColor: "#f8fafc",
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    justifyContent: "space-between"
+  },
+  tableHeaderCell: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   tableHeaderText: {
     fontWeight: "bold",
@@ -383,23 +361,25 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: "row",
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f8fafc",
     alignItems: "center",
-    paddingHorizontal: 10,
+    justifyContent: "space-between"
   },
   tableCell: {
-    // Remove text-related styles from here
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  tableCellText: {
+    fontSize: 14,
+    color: "#4b5563",
+    textAlign: "center",
   },
   statusBadge: {
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 12,
-    marginLeft: 4,
   },
   statusNormal: {
     backgroundColor: "#d1fae5", // Greenish
