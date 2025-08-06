@@ -6,11 +6,28 @@ import usePatientData from '../hooks/usePatientData';
 
 export default function DetailsScreen() {
   const router = useRouter();
-  const { patientData } = usePatientData();
+  const { patientData, isLoading } = usePatientData();
 
   const editDetails = () => {
-    router.push("/screens/PatientSetupScreen");
+    if (!patientData) return;
+    
+    router.push({
+      pathname: "/screens/PatientSetupScreen",
+      params: { 
+        mode: 'edit',
+        ...patientData,
+        insulins: JSON.stringify(patientData.insulins)
+      }
+    });
   };
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   if (!patientData) {
     return (
