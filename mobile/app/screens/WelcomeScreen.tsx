@@ -15,7 +15,7 @@ export default function WelcomeScreen() {
 
   useEffect(() => {
     if (!isLoading && patientData) {
-      router.replace("/screens/DetailsScreen");
+      router.replace("/screens/HomeScreen");
     }
   }, [isLoading, patientData]);
 
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: "#139C8B",
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 50,
     alignItems: "center",
   },
   buttonText: {

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-nati
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import usePatientData from '../hooks/usePatientData';
+import BottomMenu from "../components/BottomMenu";
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -98,6 +99,7 @@ export default function DetailsScreen() {
           <Text style={styles.notesText}>{patientData.notes}</Text>
         </View>
       )}
+      <BottomMenu activeScreen="details" />
     </ScrollView>
   );
 }

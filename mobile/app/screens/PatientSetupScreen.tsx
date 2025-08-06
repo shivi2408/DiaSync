@@ -204,7 +204,7 @@ export default function PatientSetupScreen() {
                     onPress={() => deleteTiming(insulinIndex, timingIndex)}
                     style={styles.deletePillButton}
                   >
-                    <Text style={styles.deletePillText}>X</Text>
+                    <Feather name="x" size={12} color="#962c2cff" />
                   </TouchableOpacity>
                 </View>
               ))}
@@ -358,10 +358,6 @@ const styles = StyleSheet.create({
   },
   deletePillButton: {
     marginLeft: 6,
-  },
-  deletePillText: {
-    color: "#ef4444",
-    fontWeight: 'bold',
   },
   addTimingContainer: {
     flexDirection: 'row',
