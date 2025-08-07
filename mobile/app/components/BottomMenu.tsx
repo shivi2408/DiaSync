@@ -21,14 +21,13 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="home"
                 size={20}
-                color={activeScreen === "home" ? "#fefefe":"#0bac9e"}
+                color={activeScreen === "home" ? "#fefefe" : "#0bac9e"}
               />
-            <Text style={[
-              styles.menuItemText,
-              activeScreen === "home" && styles.menuItemTextActive
-            ]}>
-              Home
-            </Text>
+              {activeScreen === "home" && (
+                <Text style={styles.menuItemTextActive}>
+                  Home
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -42,14 +41,13 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="calendar"
                 size={20}
-                color={activeScreen === "entry" ? "#fefefe":"#0bac9e"}
+                color={activeScreen === "entry" ? "#fefefe" : "#0bac9e"}
               />
-            <Text style={[
-              styles.menuItemText,
-              activeScreen === "entry" && styles.menuItemTextActive
-            ]}>
-              Entry
-            </Text>
+              {activeScreen === "entry" && (
+                <Text style={styles.menuItemTextActive}>
+                  Entry
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -63,14 +61,13 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="bar-chart"
                 size={20}
-                color={activeScreen === "report" ?  "#fefefe":"#0bac9e"}
+                color={activeScreen === "report" ? "#fefefe" : "#0bac9e"}
               />
-            <Text style={[
-              styles.menuItemText,
-              activeScreen === "report" && styles.menuItemTextActive
-            ]}>
-              Reports
-            </Text>
+              {activeScreen === "report" && (
+                <Text style={styles.menuItemTextActive}>
+                  Reports
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -84,15 +81,13 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="settings"
                 size={20}
-                color={activeScreen === "details" ? "#fefefe":"#0bac9e"}
+                color={activeScreen === "details" ? "#fefefe" : "#0bac9e"}
               />
-              
-            <Text style={[
-              styles.menuItemText,
-              activeScreen === "details" && styles.menuItemTextActive
-            ]}>
-              Profile
-            </Text>
+              {activeScreen === "details" && (
+                <Text style={styles.menuItemTextActive}>
+                  Profile
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         </Link>
@@ -104,21 +99,21 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    bottom: 20,
+    bottom: 12,
     left: 0,
     right: 0,
-    width:"100%",
+    width: "100%",
     alignItems: "center",
   },
   container: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingVertical: 6,
-    paddingHorizontal: 16,
+    padding: 10,
     borderRadius: 50,
     height: 60,
-    width:"95%",
+    width: "95%",
+    maxWidth: 500,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -129,17 +124,15 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   menuItem: {
-    flexDirection:"row",
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
   },
   iconContainer: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 50,
-    gap: 4,
-    flexDirection:"row",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -154,12 +147,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  menuItemText: {
-    display: "none"
-  },
   menuItemTextActive: {
     color: "#ffffff",
-    display:"contents",
     fontWeight: "600",
+    fontSize: 14,
+    marginLeft: 4,
   },
 });

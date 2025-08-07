@@ -15,10 +15,12 @@ import {
 import { Link } from "expo-router";
 import BottomMenu from "../components/BottomMenu";
 import usePatientData from "../hooks/usePatientData";
+import useEntries from "../hooks/useEntries";
 import * as Location from 'expo-location';
 
 export default function HomeScreen() {
   const { patientData, isLoading } = usePatientData();
+  const { entries, isLoading: isLoadingEntries } = useEntries();
   const [greeting, setGreeting] = useState("Good morning");
   const [location, setLocation] = useState("Loading location...");
 
@@ -57,7 +59,7 @@ export default function HomeScreen() {
     })();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || isLoadingEntries) {
     return (
       <View style={styles.container}>
         <Text>Loading...</Text>
@@ -79,6 +81,22 @@ export default function HomeScreen() {
     day: 'numeric',
     year: 'numeric'
   });
+
+  // Get recent entries (sorted by date, newest first)
+  const recentEntries = entries
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 2); // Show only the 3 most recent entries
+
+  // Calculate today's average blood sugar
+  const todayEntries = entries.filter(entry => {
+    const entryDate = new Date(entry.date).toDateString();
+    return entryDate === new Date().toDateString();
+  });
+
+  const todayAverage = todayEntries.length > 0
+    ? (todayEntries.reduce((sum, entry) => sum + parseFloat(entry.bloodSugar), 0) / todayEntries.length).toFixed(1)
+    : null;
+
 
   return (
     <View style={styles.container}>
@@ -125,16 +143,16 @@ export default function HomeScreen() {
               <MaterialCommunityIcons name="blood-bag" size={24} color="#075985" />
               <Text style={styles.summaryLabel}>Blood Sugar</Text>
               <Text style={styles.summaryValue}>
-                {patientData.targetMin}-{patientData.targetMax} mg/dL
+                {todayAverage ? `${todayAverage} mg/dL` : 'No data'}
               </Text>
             </View>
             <View style={styles.summaryCard}>
               <FontAwesome5 name="syringe" size={24} color="#075985" />
-              <Text style={styles.summaryLabel}>Insulin Types</Text>
+              <Text style={styles.summaryLabel}>Today's Insulin</Text>
               <Text style={styles.summaryValue}>
-                {patientData.insulins.length > 0 
-                  ? patientData.insulins.map(i => i.name).join(', ')
-                  : 'None added'}
+                {todayEntries.length > 0 
+                  ? todayEntries.reduce((count, entry) => count + entry.insulinEntries.length, 0)
+                  : 0} doses
               </Text>
             </View>
             <View style={styles.summaryCard}>
@@ -150,7 +168,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Recent Entries - Empty state */}
+        {/* Recent Entries */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Entries</Text>
@@ -158,20 +176,51 @@ export default function HomeScreen() {
               View All
             </Link>
           </View>
-          <View style={styles.emptyState}>
-            <MaterialCommunityIcons 
-              name="clipboard-text-outline" 
-              size={48} 
-              color="#9CA3AF" 
-            />
-            <Text style={styles.emptyStateText}>No entries recorded yet</Text>
-            <Link href="/screens/EntryScreen" asChild>
-              <TouchableOpacity style={styles.addEntryButton}>
-                <Feather name="plus" size={20} color="white" />
-                <Text style={styles.addEntryButtonText}>Add First Entry</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
+
+          {recentEntries.length > 0 ? (
+            <View style={styles.entriesContainer}>
+              {recentEntries.map((entry) => (
+                <View key={entry.id} style={styles.entryCard}>
+                  <View style={styles.entryHeader}>
+                    <Text style={styles.entryTime}>
+                      {new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </Text>
+                    <Text style={styles.entryBloodSugar}>
+                      {entry.bloodSugar} mg/dL
+                    </Text>
+                  </View>
+                  {entry.insulinEntries.length > 0 && (
+                    <View style={styles.insulinContainer}>
+                      <FontAwesome5 name="syringe" size={16} color="#4b5563" />
+                      <Text style={styles.insulinText}>
+                        {entry.insulinEntries.map(ins => `${ins.type} (${ins.amount}u)`).join(', ')}
+                      </Text>
+                    </View>
+                  )}
+                  {entry.notes && (
+                    <Text style={styles.entryNotes} numberOfLines={2}>
+                      <Feather name="edit-2" size={14} color="#4b5563" /> {entry.notes}
+                    </Text>
+                  )}
+                </View>
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyState}>
+              <MaterialCommunityIcons 
+                name="clipboard-text-outline" 
+                size={48} 
+                color="#9CA3AF" 
+              />
+              <Text style={styles.emptyStateText}>No entries recorded yet</Text>
+              <Link href="/screens/EntryScreen" asChild>
+                <TouchableOpacity style={styles.addEntryButton}>
+                  <Feather name="plus" size={20} color="white" />
+                  <Text style={styles.addEntryButtonText}>Add First Entry</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          )}
         </View>
       </ScrollView>
       <BottomMenu activeScreen="home" />
@@ -328,5 +377,44 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  entriesContainer: {
+    gap: 12,
+  },
+  entryCard: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#e0f2fe",
+  },
+  entryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  entryTime: {
+    fontSize: 16,
+    color: "#4b5563",
+  },
+  entryBloodSugar: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#075985",
+  },
+  insulinContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+  insulinText: {
+    fontSize: 14,
+    color: "#4b5563",
+  },
+  entryNotes: {
+    fontSize: 14,
+    color: "#4b5563",
+    fontStyle: "italic",
   },
 });
