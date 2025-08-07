@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -10,200 +10,226 @@ import {
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import BottomMenu from "../components/BottomMenu";
+import useEntries from "../hooks/useEntries";
+import usePatientData from "../hooks/usePatientData";
 
 export default function ReportScreen() {
-  const [activeTab, setActiveTab] = useState("Report");
-  const [selectedMonth, setSelectedMonth] = useState("July 2025");
+  const { entries } = useEntries();
+  const { patientData } = usePatientData();
+  const [selectedMonth, setSelectedMonth] = useState<string>("");
 
-  // Placeholder data for demonstration
-  const monthlyReportData = {
-    "July 2025": {
-      avgBloodSugar: "105.0 mg/dL",
-      totalInsulin: "9.0 units",
-      range: "105 - 105 mg/dL",
-      totalEntries: 1,
-      detailedEntries: [
-        {
-          date: "8/5/2025",
-          time: "11:39 PM",
-          bloodSugar: "105 mg/dL",
-          status: "Normal",
-          insulin: "Insugen",
-          units: "9 units",
-        },
-      ],
-    },
-    "June 2025": {
-      avgBloodSugar: "115.5 mg/dL",
-      totalInsulin: "25.0 units",
-      range: "90 - 160 mg/dL",
-      totalEntries: 15,
-      detailedEntries: [
-        {
-          date: "6/30/2025",
-          time: "8:00 AM",
-          bloodSugar: "120 mg/dL",
-          status: "Normal",
-          insulin: "Insugen",
-          units: "5 units",
-        },
-        {
-          date: "6/29/2025",
-          time: "1:00 PM",
-          bloodSugar: "150 mg/dL",
-          status: "High",
-          insulin: "Humalog",
-          units: "7 units",
-        },
-        {
-          date: "6/28/2025",
-          time: "6:00 PM",
-          bloodSugar: "95 mg/dL",
-          status: "Normal",
-          insulin: "Insugen",
-          units: "3 units",
-        },
-      ],
-    },
-  };
+  // Generate available months from entries
+  const availableMonths = useMemo(() => {
+    const monthMap = new Map<string, boolean>();
+    entries.forEach(entry => {
+      const date = new Date(entry.date);
+      const monthYear = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+      monthMap.set(monthYear, true);
+    });
+    return Array.from(monthMap.keys()).sort((a, b) => {
+      return new Date(b).getTime() - new Date(a).getTime();
+    });
+  }, [entries]);
 
-  const currentMonthData = monthlyReportData[
-    selectedMonth as keyof typeof monthlyReportData
-  ] || {
-    avgBloodSugar: "N/A",
-    totalInsulin: "N/A",
-    range: "N/A",
-    totalEntries: 0,
-    detailedEntries: [],
-  };
+  // Set default month to most recent if not set
+  if (availableMonths.length > 0 && !selectedMonth) {
+    setSelectedMonth(availableMonths[0]);
+  }
+
+  // Filter and process entries for selected month
+  const monthlyData = useMemo(() => {
+    if (!selectedMonth) return null;
+
+    const monthEntries = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      const entryMonthYear = `${entryDate.toLocaleString('default', { month: 'long' })} ${entryDate.getFullYear()}`;
+      return entryMonthYear === selectedMonth;
+    });
+
+    if (monthEntries.length === 0) return null;
+
+    // Calculate average blood sugar
+    const totalBloodSugar = monthEntries.reduce((sum, entry) => {
+      return sum + parseFloat(entry.bloodSugar);
+    }, 0);
+    const avgBloodSugar = (totalBloodSugar / monthEntries.length).toFixed(1);
+
+    // Calculate total insulin
+    const totalInsulin = monthEntries.reduce((sum, entry) => {
+      return sum + entry.insulinEntries.reduce((insSum, ins) => {
+        return insSum + parseFloat(ins.amount || '0');
+      }, 0);
+    }, 0).toFixed(1);
+
+    // Calculate range
+    const bloodSugarValues = monthEntries.map(e => parseFloat(e.bloodSugar));
+    const min = Math.min(...bloodSugarValues);
+    const max = Math.max(...bloodSugarValues);
+
+    // Prepare detailed entries
+    const detailedEntries = monthEntries.map(entry => {
+      const entryDate = new Date(entry.date);
+      const status = patientData
+        ? (parseFloat(entry.bloodSugar) < parseFloat(patientData.targetMin)
+          ? "Low"
+          : parseFloat(entry.bloodSugar) > parseFloat(patientData.targetMax)
+          ? "High"
+          : "Normal")
+        : "Normal";
+
+      return {
+        id: entry.id,
+        date: entryDate.toLocaleDateString(),
+        time: entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        bloodSugar: `${entry.bloodSugar} mg/dL`,
+        status,
+        insulin: entry.insulinEntries.length > 0 
+          ? entry.insulinEntries.map(i => i.type).join(', ')
+          : 'None',
+        units: entry.insulinEntries.length > 0
+          ? entry.insulinEntries.map(i => `${i.amount}u`).join(', ')
+          : '',
+      };
+    });
+
+    return {
+      avgBloodSugar: `${avgBloodSugar} mg/dL`,
+      totalInsulin: `${totalInsulin} units`,
+      range: `${min} - ${max} mg/dL`,
+      totalEntries: monthEntries.length,
+      detailedEntries,
+    };
+  }, [selectedMonth, entries, patientData]);
 
   const handleDownloadPDF = () => {
     Alert.alert(
       "Download PDF",
       `Generating PDF report for ${selectedMonth}... (Functionality not implemented)`
     );
-    // In a real app, you would integrate a PDF generation library here
   };
 
   return (
     <View style={styles.container}>
-
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {activeTab === "Report" && (
-          <>
-            <View style={styles.card}>
-              <View style={styles.cardHeader}>
-                <Feather name="file-text" size={20} color="#075985" />
-                <Text style={styles.cardTitle}>Monthly Report</Text>
-              </View>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Feather name="file-text" size={20} color="#075985" />
+            <Text style={styles.cardTitle}>Monthly Report</Text>
+          </View>
 
-              <View style={styles.monthSelector}>
-                <Feather name="calendar" size={18} color="#075985" />
-                <Text style={styles.monthSelectorLabel}>Select Month</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={selectedMonth}
-                    onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-                    style={styles.picker}>
-                    <Picker.Item label="July 2025" value="July 2025" />
-                    <Picker.Item label="June 2025" value="June 2025" />
-                    <Picker.Item label="May 2025" value="May 2025" />
-                  </Picker>
-                </View>
-              </View>
+          <View style={styles.monthSelector}>
+            <Feather name="calendar" size={18} color="#075985" />
+            <Text style={styles.monthSelectorLabel}>Select Month</Text>
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={selectedMonth}
+                onValueChange={setSelectedMonth}
+                style={styles.picker}
+              >
+                {availableMonths.map(month => (
+                  <Picker.Item key={month} label={month} value={month} />
+                ))}
+              </Picker>
+            </View>
+          </View>
 
+          {monthlyData ? (
+            <>
               <View style={styles.summaryGrid}>
                 <View style={[styles.summaryItem, styles.summaryItemBlue]}>
                   <Text style={styles.summaryLabel}>Avg Blood Sugar</Text>
                   <Text style={styles.summaryValue}>
-                    {currentMonthData.avgBloodSugar}
+                    {monthlyData.avgBloodSugar}
                   </Text>
                 </View>
                 <View style={[styles.summaryItem, styles.summaryItemGreen]}>
                   <Text style={styles.summaryLabel}>Total Insulin</Text>
                   <Text style={styles.summaryValue}>
-                    {currentMonthData.totalInsulin}
+                    {monthlyData.totalInsulin}
                   </Text>
                 </View>
                 <View style={[styles.summaryItem, styles.summaryItemPurple]}>
                   <Text style={styles.summaryLabel}>Range</Text>
                   <Text style={styles.summaryValue}>
-                    {currentMonthData.range}
+                    {monthlyData.range}
                   </Text>
                 </View>
                 <View style={[styles.summaryItem, styles.summaryItemOrange]}>
                   <Text style={styles.summaryLabel}>Total Entries</Text>
                   <Text style={styles.summaryValue}>
-                    {currentMonthData.totalEntries}
+                    {monthlyData.totalEntries}
                   </Text>
                 </View>
               </View>
 
               <TouchableOpacity
                 style={styles.downloadButton}
-                onPress={handleDownloadPDF}>
+                onPress={handleDownloadPDF}
+              >
                 <Feather name="download" size={20} color="white" />
                 <Text style={styles.downloadButtonText}>
                   Download PDF Report
                 </Text>
               </TouchableOpacity>
+            </>
+          ) : (
+            <Text style={styles.noEntriesText}>No data available for this month</Text>
+          )}
+        </View>
+
+        {monthlyData && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Detailed Entries</Text>
+            <View style={styles.tableHeader}>
+              <View style={styles.tableHeaderCell}>
+                <Text style={styles.tableHeaderText}>Date</Text>
+              </View>
+              <View style={styles.tableHeaderCell}>
+                <Text style={styles.tableHeaderText}>Time</Text>
+              </View>
+              <View style={styles.tableHeaderCell}>
+                <Text style={styles.tableHeaderText}>Blood Sugar</Text>
+              </View>
+              <View style={styles.tableHeaderCell}>
+                <Text style={styles.tableHeaderText}>Insulin</Text>
+              </View>
             </View>
 
-            <View style={styles.card}>
-  <Text style={styles.cardTitle}>Detailed Entries</Text>
-  <View style={styles.tableHeader}>
-    <View style={styles.tableHeaderCell}>
-      <Text style={styles.tableHeaderText}>Date</Text>
-    </View>
-    <View style={styles.tableHeaderCell}>
-      <Text style={styles.tableHeaderText}>Time</Text>
-    </View>
-    <View style={styles.tableHeaderCell}>
-      <Text style={styles.tableHeaderText}>Blood Sugar</Text>
-    </View>
-    <View style={styles.tableHeaderCell}>
-      <Text style={styles.tableHeaderText}>Insulin</Text>
-    </View>
-  </View>
-
-  {currentMonthData.detailedEntries.length > 0 ? (
-    currentMonthData.detailedEntries.map((entry, index) => (
-      <View key={index} style={styles.tableRow}>
-        <View style={styles.tableCell}>
-          <Text style={styles.tableCellText}>{entry.date}</Text>
-        </View>
-        <View style={styles.tableCell}>
-          <Text style={styles.tableCellText}>{entry.time}</Text>
-        </View>
-        <View style={[styles.tableCell, { flexDirection: "row", gap: 4 }]}>
-          <Text style={styles.tableCellText}>{entry.bloodSugar}</Text>
-          <View
-            style={[
-              styles.statusBadge,
-              entry.status === "Normal"
-                ? styles.statusNormal
-                : entry.status === "High"
-                ? styles.statusHigh
-                : styles.statusLow,
-            ]}
-          >
-            <Text style={styles.statusBadgeText}>{entry.status}</Text>
+            {monthlyData.detailedEntries.length > 0 ? (
+              monthlyData.detailedEntries.map((entry) => (
+                <View key={entry.id} style={styles.tableRow}>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.tableCellText}>{entry.date}</Text>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.tableCellText}>{entry.time}</Text>
+                  </View>
+                  <View style={[styles.tableCell, { flexDirection: "row", gap: 4 }]}>
+                    <Text style={styles.tableCellText}>{entry.bloodSugar}</Text>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        entry.status === "Normal"
+                          ? styles.statusNormal
+                          : entry.status === "High"
+                          ? styles.statusHigh
+                          : styles.statusLow,
+                      ]}
+                    >
+                      <Text style={styles.statusBadgeText}>{entry.status}</Text>
+                    </View>
+                  </View>
+                  <View style={styles.tableCell}>
+                    <Text style={styles.insulinName}>{entry.insulin}</Text>
+                    <Text style={styles.insulinUnits}>{entry.units}</Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.noEntriesText}>No entries for this month.</Text>
+            )}
           </View>
-        </View>
-        <View style={styles.tableCell}>
-          <Text style={styles.insulinName}>{entry.insulin}</Text>
-          <Text style={styles.insulinUnits}>{entry.units}</Text>
-        </View>
-      </View>
-    ))
-  ) : (
-    <Text style={styles.noEntriesText}>No entries for this month.</Text>
-  )}
-</View>
-
-          </>
         )}
-        {/* Placeholder for Entry and History tabs if they were to be implemented here */}
       </ScrollView>
       <BottomMenu activeScreen="report" />
     </View>
@@ -299,7 +325,7 @@ const styles = StyleSheet.create({
   },
   summaryItem: {
     borderRadius: 8,
-    padding: 16,
+    padding: 12,
     width: "48%",
     alignItems: "center",
     justifyContent: "center",
