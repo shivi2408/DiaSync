@@ -270,9 +270,9 @@ const styles = StyleSheet.create({
     color: "#139C8B",
   },
   scrollViewContent: {
-    padding: 24,
-    paddingBottom: 40,
-    gap: 24,
+    padding: 20,
+    paddingBottom: 80,
+    gap: 18,
   },
   card: {
     backgroundColor: "white",
