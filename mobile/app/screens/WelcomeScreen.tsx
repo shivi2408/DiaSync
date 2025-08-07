@@ -1,8 +1,8 @@
 // app/screens/WelcomeScreen.tsx
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { 
-  MaterialCommunityIcons, 
-  FontAwesome5, 
+import {
+  MaterialCommunityIcons,
+  FontAwesome5,
   Feather,
 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -19,7 +19,7 @@ export default function WelcomeScreen() {
       const timer = setTimeout(() => {
         router.replace("/screens/HomeScreen");
       }, 3000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isLoading, patientData]);
@@ -74,24 +74,23 @@ export default function WelcomeScreen() {
             <MaterialCommunityIcons
               name="chart-line"
               size={24}
-              color="#075985"
+              color="#212529"
             />
             <Text style={styles.featureText}>Track blood sugar levels</Text>
           </View>
           <View style={styles.featureItem}>
-            <FontAwesome5 name="syringe" size={20} color="#075985" />
+            <FontAwesome5 name="syringe" size={20} color="#212529" />
             <Text style={styles.featureText}>Record insulin doses</Text>
           </View>
           <View style={styles.featureItem}>
-            <Feather name="calendar" size={24} color="#075985" />
+            <Feather name="calendar" size={24} color="#212529" />
             <Text style={styles.featureText}>Monthly reports & PDF export</Text>
           </View>
         </View>
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("/screens/PatientSetupScreen")}
-      >
+        onPress={() => router.push("/screens/PatientSetupScreen")}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -120,8 +119,7 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 34,
     fontWeight: "bold",
-    fontFamily: "monospace",
-    color: "#139686ff",
+    color: "#2c2c2cff",
   },
   content: {
     gap: 8,
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 22,
     fontWeight: "600",
-    color: "#139C8B",
+    color: "#212529",
     textAlign: "center",
   },
   subTagline: {
@@ -152,11 +150,11 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontSize: 16,
-    color: "#075985",
+    color: "#212529",
     fontWeight: "500",
   },
   button: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     padding: 16,
     borderRadius: 50,
     alignItems: "center",

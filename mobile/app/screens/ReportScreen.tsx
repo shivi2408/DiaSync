@@ -21,9 +21,11 @@ export default function ReportScreen() {
   // Generate available months from entries
   const availableMonths = useMemo(() => {
     const monthMap = new Map<string, boolean>();
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       const date = new Date(entry.date);
-      const monthYear = `${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`;
+      const monthYear = `${date.toLocaleString("default", {
+        month: "long",
+      })} ${date.getFullYear()}`;
       monthMap.set(monthYear, true);
     });
     return Array.from(monthMap.keys()).sort((a, b) => {
@@ -40,9 +42,11 @@ export default function ReportScreen() {
   const monthlyData = useMemo(() => {
     if (!selectedMonth) return null;
 
-    const monthEntries = entries.filter(entry => {
+    const monthEntries = entries.filter((entry) => {
       const entryDate = new Date(entry.date);
-      const entryMonthYear = `${entryDate.toLocaleString('default', { month: 'long' })} ${entryDate.getFullYear()}`;
+      const entryMonthYear = `${entryDate.toLocaleString("default", {
+        month: "long",
+      })} ${entryDate.getFullYear()}`;
       return entryMonthYear === selectedMonth;
     });
 
@@ -55,40 +59,50 @@ export default function ReportScreen() {
     const avgBloodSugar = (totalBloodSugar / monthEntries.length).toFixed(1);
 
     // Calculate total insulin
-    const totalInsulin = monthEntries.reduce((sum, entry) => {
-      return sum + entry.insulinEntries.reduce((insSum, ins) => {
-        return insSum + parseFloat(ins.amount || '0');
-      }, 0);
-    }, 0).toFixed(1);
+    const totalInsulin = monthEntries
+      .reduce((sum, entry) => {
+        return (
+          sum +
+          entry.insulinEntries.reduce((insSum, ins) => {
+            return insSum + parseFloat(ins.amount || "0");
+          }, 0)
+        );
+      }, 0)
+      .toFixed(1);
 
     // Calculate range
-    const bloodSugarValues = monthEntries.map(e => parseFloat(e.bloodSugar));
+    const bloodSugarValues = monthEntries.map((e) => parseFloat(e.bloodSugar));
     const min = Math.min(...bloodSugarValues);
     const max = Math.max(...bloodSugarValues);
 
     // Prepare detailed entries
-    const detailedEntries = monthEntries.map(entry => {
+    const detailedEntries = monthEntries.map((entry) => {
       const entryDate = new Date(entry.date);
       const status = patientData
-        ? (parseFloat(entry.bloodSugar) < parseFloat(patientData.targetMin)
+        ? parseFloat(entry.bloodSugar) < parseFloat(patientData.targetMin)
           ? "Low"
           : parseFloat(entry.bloodSugar) > parseFloat(patientData.targetMax)
           ? "High"
-          : "Normal")
+          : "Normal"
         : "Normal";
 
       return {
         id: entry.id,
         date: entryDate.toLocaleDateString(),
-        time: entryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: entryDate.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         bloodSugar: `${entry.bloodSugar} mg/dL`,
         status,
-        insulin: entry.insulinEntries.length > 0 
-          ? entry.insulinEntries.map(i => i.type).join(', ')
-          : 'None',
-        units: entry.insulinEntries.length > 0
-          ? entry.insulinEntries.map(i => `${i.amount}u`).join(', ')
-          : '',
+        insulin:
+          entry.insulinEntries.length > 0
+            ? entry.insulinEntries.map((i) => i.type).join(", ")
+            : "None",
+        units:
+          entry.insulinEntries.length > 0
+            ? entry.insulinEntries.map((i) => `${i.amount}u`).join(", ")
+            : "",
       };
     });
 
@@ -113,20 +127,19 @@ export default function ReportScreen() {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Feather name="file-text" size={20} color="#075985" />
+            <Feather name="file-text" size={20} color="#212529" />
             <Text style={styles.cardTitle}>Monthly Report</Text>
           </View>
 
           <View style={styles.monthSelector}>
-            <Feather name="calendar" size={18} color="#075985" />
+            <Feather name="calendar" size={18} color="#212529" />
             <Text style={styles.monthSelectorLabel}>Select Month</Text>
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedMonth}
                 onValueChange={setSelectedMonth}
-                style={styles.picker}
-              >
-                {availableMonths.map(month => (
+                style={styles.picker}>
+                {availableMonths.map((month) => (
                   <Picker.Item key={month} label={month} value={month} />
                 ))}
               </Picker>
@@ -150,9 +163,7 @@ export default function ReportScreen() {
                 </View>
                 <View style={[styles.summaryItem, styles.summaryItemPurple]}>
                   <Text style={styles.summaryLabel}>Range</Text>
-                  <Text style={styles.summaryValue}>
-                    {monthlyData.range}
-                  </Text>
+                  <Text style={styles.summaryValue}>{monthlyData.range}</Text>
                 </View>
                 <View style={[styles.summaryItem, styles.summaryItemOrange]}>
                   <Text style={styles.summaryLabel}>Total Entries</Text>
@@ -164,8 +175,7 @@ export default function ReportScreen() {
 
               <TouchableOpacity
                 style={styles.downloadButton}
-                onPress={handleDownloadPDF}
-              >
+                onPress={handleDownloadPDF}>
                 <Feather name="download" size={20} color="white" />
                 <Text style={styles.downloadButtonText}>
                   Download PDF Report
@@ -173,7 +183,9 @@ export default function ReportScreen() {
               </TouchableOpacity>
             </>
           ) : (
-            <Text style={styles.noEntriesText}>No data available for this month</Text>
+            <Text style={styles.noEntriesText}>
+              No data available for this month
+            </Text>
           )}
         </View>
 
@@ -204,7 +216,11 @@ export default function ReportScreen() {
                   <View style={styles.tableCell}>
                     <Text style={styles.tableCellText}>{entry.time}</Text>
                   </View>
-                  <View style={[styles.tableCell, { flexDirection: "row", gap: 4 }]}>
+                  <View
+                    style={[
+                      styles.tableCell,
+                      { flexDirection: "row", gap: 4 },
+                    ]}>
                     <Text style={styles.tableCellText}>{entry.bloodSugar}</Text>
                     <View
                       style={[
@@ -214,8 +230,7 @@ export default function ReportScreen() {
                           : entry.status === "High"
                           ? styles.statusHigh
                           : styles.statusLow,
-                      ]}
-                    >
+                      ]}>
                       <Text style={styles.statusBadgeText}>{entry.status}</Text>
                     </View>
                   </View>
@@ -226,7 +241,9 @@ export default function ReportScreen() {
                 </View>
               ))
             ) : (
-              <Text style={styles.noEntriesText}>No entries for this month.</Text>
+              <Text style={styles.noEntriesText}>
+                No entries for this month.
+              </Text>
             )}
           </View>
         )}
@@ -240,34 +257,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f0f9ff",
-  },
-  tabContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "white",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0f2fe",
-    paddingHorizontal: 16,
-  },
-  tabButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    gap: 8,
-  },
-  activeTabButton: {
-    backgroundColor: "#e0f2fe",
-  },
-  tabText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#4b5563",
-  },
-  activeTabText: {
-    color: "#139C8B",
   },
   scrollViewContent: {
     padding: 20,
@@ -288,9 +277,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   cardTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#075985",
+    color: "#212529",
   },
   monthSelector: {
     flexDirection: "row",
@@ -305,7 +294,7 @@ const styles = StyleSheet.create({
   monthSelectorLabel: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#075985",
+    color: "#212529",
   },
   pickerContainer: {
     flex: 1,
@@ -351,11 +340,11 @@ const styles = StyleSheet.create({
   summaryValue: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#075985",
+    color: "#212529",
     textAlign: "center",
   },
   downloadButton: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     padding: 10,
     borderRadius: 50,
     alignItems: "center",
@@ -365,7 +354,7 @@ const styles = StyleSheet.create({
   },
   downloadButtonText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
   tableHeader: {
@@ -373,7 +362,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8fafc",
     borderRadius: 8,
     paddingVertical: 10,
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   tableHeaderCell: {
     alignItems: "center",
@@ -381,7 +370,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderText: {
     fontWeight: "bold",
-    color: "#075985",
+    color: "#212529",
     fontSize: 14,
     textAlign: "center",
   },
@@ -391,7 +380,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f8fafc",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   tableCell: {
     justifyContent: "center",
@@ -419,7 +408,7 @@ const styles = StyleSheet.create({
   statusBadgeText: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#075985", // Darker blue for text
+    color: "#212529", // Darker blue for text
   },
   insulinName: {
     fontWeight: "500",

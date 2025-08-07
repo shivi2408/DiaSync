@@ -1,34 +1,45 @@
 // app/screens/PatientSetupScreen.tsx
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { AntDesign, Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import usePatientData from '../hooks/usePatientData';
+import usePatientData from "../hooks/usePatientData";
 
 export default function PatientSetupScreen() {
   const router = useRouter();
   const { savePatientData } = usePatientData();
   const params = useLocalSearchParams();
-  const isEditMode = params.mode === 'edit';
+  const isEditMode = params.mode === "edit";
   const [newTiming, setNewTiming] = useState("");
 
   // Parse the insulins if they exist in params
-  const initialInsulins = params.insulins ? JSON.parse(params.insulins as string) : [];
+  const initialInsulins = params.insulins
+    ? JSON.parse(params.insulins as string)
+    : [];
 
-  const [insulins, setInsulins] = useState<Array<{
-    name: string;
-    timings: string[];
-  }>>(initialInsulins);
+  const [insulins, setInsulins] = useState<
+    Array<{
+      name: string;
+      timings: string[];
+    }>
+  >(initialInsulins);
 
   const [patientDetails, setPatientDetails] = useState({
-    name: params.name as string || "",
-    age: params.age as string || "",
-    gender: params.gender as string || "",
-    diabetesType: params.diabetesType as string || "1",
-    startYear: params.startYear as string || "",
-    targetMin: params.targetMin as string || "70",
-    targetMax: params.targetMax as string || "180",
-    notes: params.notes as string || ""
+    name: (params.name as string) || "",
+    age: (params.age as string) || "",
+    gender: (params.gender as string) || "",
+    diabetesType: (params.diabetesType as string) || "1",
+    startYear: (params.startYear as string) || "",
+    targetMin: (params.targetMin as string) || "70",
+    targetMax: (params.targetMax as string) || "180",
+    notes: (params.notes as string) || "",
   });
 
   // Handle case when params are loaded after component mounts
@@ -64,13 +75,13 @@ export default function PatientSetupScreen() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setPatientDetails({...patientDetails, [field]: value});
+    setPatientDetails({ ...patientDetails, [field]: value });
   };
 
   const completeSetup = async () => {
     const data = {
       ...patientDetails,
-      insulins: insulins.filter(insulin => insulin.name.trim() !== "")
+      insulins: insulins.filter((insulin) => insulin.name.trim() !== ""),
     };
     await savePatientData(data);
     router.push("/screens/DetailsScreen");
@@ -83,7 +94,9 @@ export default function PatientSetupScreen() {
           {isEditMode ? "Edit Patient Details" : "Patient Setup"}
         </Text>
         <Text style={styles.subtitle}>
-          {isEditMode ? "Update your diabetes care profile" : "Let's set up your diabetes care profile"}
+          {isEditMode
+            ? "Update your diabetes care profile"
+            : "Let's set up your diabetes care profile"}
         </Text>
       </View>
 
@@ -96,7 +109,7 @@ export default function PatientSetupScreen() {
             placeholder="John Doe"
             placeholderTextColor="#acacac"
             value={patientDetails.name}
-            onChangeText={(text) => handleInputChange('name', text)}
+            onChangeText={(text) => handleInputChange("name", text)}
           />
         </View>
 
@@ -109,7 +122,7 @@ export default function PatientSetupScreen() {
               placeholderTextColor="#acacac"
               keyboardType="numeric"
               value={patientDetails.age}
-              onChangeText={(text) => handleInputChange('age', text)}
+              onChangeText={(text) => handleInputChange("age", text)}
             />
           </View>
           <View style={styles.formGroup}>
@@ -119,7 +132,7 @@ export default function PatientSetupScreen() {
               placeholder="Male"
               placeholderTextColor="#acacac"
               value={patientDetails.gender}
-              onChangeText={(text) => handleInputChange('gender', text)}
+              onChangeText={(text) => handleInputChange("gender", text)}
             />
           </View>
         </View>
@@ -131,17 +144,37 @@ export default function PatientSetupScreen() {
           <View style={styles.formGroup}>
             <Text style={styles.label}>Diabetes Type</Text>
             <View style={styles.radioGroup}>
-              <TouchableOpacity 
-                style={[styles.radioButton, patientDetails.diabetesType === "1" && styles.radioButtonSelected]}
-                onPress={() => handleInputChange('diabetesType', "1")}
-              >
-                <Text style={patientDetails.diabetesType === "1" ? styles.radioTextSelected : styles.radioText}>Type 1</Text>
+              <TouchableOpacity
+                style={[
+                  styles.radioButton,
+                  patientDetails.diabetesType === "1" &&
+                    styles.radioButtonSelected,
+                ]}
+                onPress={() => handleInputChange("diabetesType", "1")}>
+                <Text
+                  style={
+                    patientDetails.diabetesType === "1"
+                      ? styles.radioTextSelected
+                      : styles.radioText
+                  }>
+                  Type 1
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.radioButton, patientDetails.diabetesType === "2" && styles.radioButtonSelected]}
-                onPress={() => handleInputChange('diabetesType', "2")}
-              >
-                <Text style={patientDetails.diabetesType === "2" ? styles.radioTextSelected : styles.radioText}>Type 2</Text>
+              <TouchableOpacity
+                style={[
+                  styles.radioButton,
+                  patientDetails.diabetesType === "2" &&
+                    styles.radioButtonSelected,
+                ]}
+                onPress={() => handleInputChange("diabetesType", "2")}>
+                <Text
+                  style={
+                    patientDetails.diabetesType === "2"
+                      ? styles.radioTextSelected
+                      : styles.radioText
+                  }>
+                  Type 2
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -153,7 +186,7 @@ export default function PatientSetupScreen() {
               placeholderTextColor="#acacac"
               keyboardType="numeric"
               value={patientDetails.startYear}
-              onChangeText={(text) => handleInputChange('startYear', text)}
+              onChangeText={(text) => handleInputChange("startYear", text)}
             />
           </View>
         </View>
@@ -167,7 +200,7 @@ export default function PatientSetupScreen() {
               placeholderTextColor="#acacac"
               keyboardType="numeric"
               value={patientDetails.targetMin}
-              onChangeText={(text) => handleInputChange('targetMin', text)}
+              onChangeText={(text) => handleInputChange("targetMin", text)}
             />
           </View>
           <View style={styles.formGroup}>
@@ -178,7 +211,7 @@ export default function PatientSetupScreen() {
               placeholderTextColor="#acacac"
               keyboardType="numeric"
               value={patientDetails.targetMax}
-              onChangeText={(text) => handleInputChange('targetMax', text)}
+              onChangeText={(text) => handleInputChange("targetMax", text)}
             />
           </View>
         </View>
@@ -195,21 +228,20 @@ export default function PatientSetupScreen() {
               value={insulin.name}
               onChangeText={(text) => updateInsulinName(insulinIndex, text)}
             />
-            
+
             <View style={styles.timingsContainer}>
               {insulin.timings.map((timing, timingIndex) => (
                 <View key={timingIndex} style={styles.timingPill}>
                   <Text style={styles.timingText}>{timing}</Text>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     onPress={() => deleteTiming(insulinIndex, timingIndex)}
-                    style={styles.deletePillButton}
-                  >
+                    style={styles.deletePillButton}>
                     <Feather name="x" size={12} color="#962c2cff" />
                   </TouchableOpacity>
                 </View>
               ))}
             </View>
-            
+
             <View style={styles.addTimingContainer}>
               <TextInput
                 style={styles.newTimingInput}
@@ -219,29 +251,22 @@ export default function PatientSetupScreen() {
                 onChangeText={setNewTiming}
                 onSubmitEditing={() => addNewTiming(insulinIndex)}
               />
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.addTimingButton}
-                onPress={() => addNewTiming(insulinIndex)}
-              >
+                onPress={() => addNewTiming(insulinIndex)}>
                 <Text style={styles.addTimingButtonText}>Add</Text>
               </TouchableOpacity>
             </View>
           </View>
         ))}
-        
-        <TouchableOpacity 
-          style={styles.addInsulinButton} 
-          onPress={addInsulin}
-        >
+
+        <TouchableOpacity style={styles.addInsulinButton} onPress={addInsulin}>
           <MaterialCommunityIcons name="needle" size={20} color="white" />
           <Text style={styles.addInsulinButtonText}>Add Insulin Type</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity 
-        style={styles.completeButton} 
-        onPress={completeSetup}
-      >
+      <TouchableOpacity style={styles.completeButton} onPress={completeSetup}>
         <Text style={styles.completeButtonText}>
           {isEditMode ? "Update Profile" : "Complete Setup"}
         </Text>
@@ -283,7 +308,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#075985",
+    color: "#212529",
   },
   formGroup: {
     gap: 8,
@@ -292,7 +317,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "500",
-    color: "#075985",
+    color: "#212529",
   },
   input: {
     backgroundColor: "#f8fafc",
@@ -321,13 +346,13 @@ const styles = StyleSheet.create({
   },
   radioButtonSelected: {
     backgroundColor: "#e0f2fe",
-    borderColor: "#075985",
+    borderColor: "#212529",
   },
   radioText: {
     color: "#64748b",
   },
   radioTextSelected: {
-    color: "#075985",
+    color: "#212529",
     fontWeight: "500",
   },
   insulinCard: {
@@ -339,13 +364,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   timingsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   timingPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#e0f2fe",
     paddingVertical: 6,
     paddingLeft: 12,
@@ -353,14 +378,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   timingText: {
-    color: "#075985",
+    color: "#212529",
     fontSize: 14,
   },
   deletePillButton: {
     marginLeft: 6,
   },
   addTimingContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
   },
   newTimingInput: {
@@ -374,14 +399,14 @@ const styles = StyleSheet.create({
     borderColor: "#e0f2fe",
   },
   addTimingButton: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     paddingHorizontal: 16,
     borderRadius: 8,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   addTimingButtonText: {
     color: "white",
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   addInsulinButton: {
     flexDirection: "row",
@@ -389,7 +414,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     padding: 14,
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     borderRadius: 8,
   },
   addInsulinButtonText: {
@@ -398,7 +423,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   completeButton: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     padding: 16,
     borderRadius: 10,
     alignItems: "center",

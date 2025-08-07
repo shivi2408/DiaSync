@@ -13,7 +13,6 @@ import {
   FontAwesome5,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { MapPin, Edit2, Plus } from "lucide-react-native";
 import * as Location from "expo-location";
 import BottomMenu from "../components/BottomMenu";
 import Avatar from "../components/Avatar";
@@ -112,7 +111,7 @@ export default function HomeScreen() {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.userInfo}>
-            <Avatar name={patientData.name} size={50} borderColor="#139C8B" />
+            <Avatar name={patientData.name} size={50} borderColor="#212529" />
             <View>
               <Text style={styles.greeting}>{greeting}!</Text>
               <Text style={styles.userName}>{patientData.name}</Text>
@@ -157,7 +156,7 @@ export default function HomeScreen() {
                     styles.iconBackground,
                     { backgroundColor: "rgba(129, 129, 129, 0.1)" },
                   ]}>
-                  <FontAwesome5 name="syringe" size={24} color="#075985" />
+                  <FontAwesome5 name="syringe" size={24} color="#212529" />
                 </View>
               </View>
               <Text style={styles.summaryLabel}>Today&apos;s Insulin</Text>
@@ -286,7 +285,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 8,
   },
   userInfo: {
     flexDirection: "row",
@@ -302,12 +300,11 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 22,
     fontWeight: "600",
-    color: "#139C8B",
+    color: "#212529",
   },
   greeting: {
     fontSize: 16,
     color: "#6B7280",
-    marginBottom: 2,
   },
   userName: {
     fontSize: 22,
@@ -348,7 +345,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 4,
   },
   sectionTitle: {
     fontSize: 20,
@@ -361,9 +357,10 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   viewAll: {
-    fontSize: 16,
-    color: "#139C8B",
+    fontSize: 14,
+    color: "#838383ff",
     fontWeight: "600",
+    textDecorationLine: 'underline',
   },
   dailySummaryGrid: {
     flexDirection: "row",
@@ -394,7 +391,6 @@ const styles = StyleSheet.create({
     }),
   },
   iconContainer: {
-    marginBottom: 4,
   },
   iconBackground: {
     width: 44,
@@ -455,7 +451,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   addEntryButton: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     padding: 16,
     borderRadius: 12,
     flexDirection: "row",
@@ -492,7 +488,6 @@ const styles = StyleSheet.create({
   entryHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 12,
   },
   entryTime: {
     fontSize: 16,
@@ -502,13 +497,12 @@ const styles = StyleSheet.create({
   entryBloodSugar: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#139C8B",
+    color: "#212529",
   },
   insulinContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginBottom: 8,
   },
   insulinText: {
     fontSize: 14,
@@ -560,12 +554,11 @@ const styles = StyleSheet.create({
     height: 24,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 4,
   },
   homeIcon: {
     width: 20,
     height: 20,
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     borderRadius: 4,
   },
   statsIcon: {
@@ -591,7 +584,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   activeMenuText: {
-    color: "#139C8B",
+    color: "#212529",
     fontWeight: "600",
   },
 });

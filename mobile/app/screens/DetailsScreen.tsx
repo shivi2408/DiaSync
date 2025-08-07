@@ -50,7 +50,7 @@ export default function DetailsScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>Patient Information</Text>
           <TouchableOpacity onPress={editDetails} style={styles.editButton}>
-            <Feather name="edit" size={20} color="#139C8B" />
+            <Feather name="edit" size={20} color="#212529" />
           </TouchableOpacity>
         </View>
 
@@ -134,9 +134,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#139686",
+    color: "#2b2b2bff",
   },
   editButton: {
     padding: 8,
@@ -150,21 +150,21 @@ const styles = StyleSheet.create({
     borderColor: "#e0f2fe",
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
-    color: "#075985",
+    color: "#212529",
   },
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   infoLabel: {
-    fontSize: 16,
-    color: "#075985",
+    fontSize: 14,
+    color: "#212529",
     fontWeight: "500",
   },
   infoValue: {
-    fontSize: 16,
+    fontSize: 13,
     color: "#4b5563",
   },
   insulinCard: {
@@ -177,15 +177,15 @@ const styles = StyleSheet.create({
   insulinName: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#075985",
+    color: "#212529",
   },
   timingText: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#7a7f86ff",
   },
   notesText: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#7a7f86ff",
     lineHeight: 20,
   },
 });
