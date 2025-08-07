@@ -7,7 +7,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['#9affe6ec', '#cffeecec', '#9affe6ec']}
+        colors={['#2b2b2bec', '#3b3b3bec', '#2b2b2bec']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.container}
@@ -21,7 +21,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="home"
                 size={20}
-                color={activeScreen === "home" ? "#fefefe" : "#0bac9e"}
+                color={activeScreen === "home" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "home" && (
                 <Text style={styles.menuItemTextActive}>
@@ -41,7 +41,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="calendar"
                 size={20}
-                color={activeScreen === "entry" ? "#fefefe" : "#0bac9e"}
+                color={activeScreen === "entry" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "entry" && (
                 <Text style={styles.menuItemTextActive}>
@@ -61,7 +61,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="bar-chart"
                 size={20}
-                color={activeScreen === "report" ? "#fefefe" : "#0bac9e"}
+                color={activeScreen === "report" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "report" && (
                 <Text style={styles.menuItemTextActive}>
@@ -81,7 +81,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               <Feather
                 name="settings"
                 size={20}
-                color={activeScreen === "details" ? "#fefefe" : "#0bac9e"}
+                color={activeScreen === "details" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "details" && (
                 <Text style={styles.menuItemTextActive}>
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 50,
     height: 60,
-    width: "95%",
+    width: "85%",
     maxWidth: 500,
     shadowColor: "#000",
     shadowOffset: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   activeIconContainer: {
-    backgroundColor: "#0bac9e",
+    backgroundColor: "#ecececff",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   menuItemTextActive: {
-    color: "#ffffff",
+    color: "#1b1b1b",
     fontWeight: "600",
     fontSize: 14,
     marginLeft: 4,

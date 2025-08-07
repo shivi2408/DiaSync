@@ -11,7 +11,7 @@ import {
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker"; // For dropdown
 import BottomMenu from "../components/BottomMenu";
-import CustomDropdown from "../components/CustomDropdown";
+import Toast from 'react-native-toast-message';
 import useEntries from "../hooks/useEntries";
 import usePatientData from "../hooks/usePatientData";
 
@@ -94,9 +94,21 @@ export default function EntryScreen() {
       setInsulinEntries([{ id: 1, type: "", amount: "", time: "" }]);
       setNotes("");
 
-      Alert.alert("Success", "Entry added successfully!");
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Entry added successfully!',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
     } catch (error) {
-      Alert.alert("Error", "Failed to save entry. Please try again.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to save entry. Please try again.',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
       console.error(error);
     }
   };
@@ -107,7 +119,7 @@ export default function EntryScreen() {
         {activeTab === "Entry" && (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Feather name="plus" size={20} color="#075985" />
+              <Feather name="plus" size={20} color="#212529" />
               <Text style={styles.cardTitle}>New Entry</Text>
             </View>
             <Text style={styles.cardSubtitle}>
@@ -131,12 +143,12 @@ export default function EntryScreen() {
 
             <View style={styles.inputGroup}>
               <View style={styles.inputLabelContainer}>
-                <Feather name="edit-3" size={18} color="#075985" />
+                <Feather name="edit-3" size={18} color="#212529" />
                 <Text style={styles.inputLabel}>Insulin Entries</Text>
                 <TouchableOpacity
                   onPress={addInsulinEntry}
                   style={styles.addInsulinButton}>
-                  <Feather name="plus" size={16} color="#075985" />
+                  <Feather name="plus" size={16} color="#212529" />
                 </TouchableOpacity>
               </View>
 
@@ -266,7 +278,7 @@ const styles = StyleSheet.create({
     color: "#4b5563",
   },
   activeTabText: {
-    color: "#139C8B",
+    color: "#212529",
   },
   scrollViewContent: {
     padding: 20,
@@ -288,7 +300,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#075985",
+    color: "#212529",
   },
   cardSubtitle: {
     fontSize: 16,
@@ -305,7 +317,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#075985",
+    color: "#212529",
   },
   input: {
     borderWidth: 1,
@@ -342,7 +354,7 @@ const styles = StyleSheet.create({
   insulinCardTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#075985",
+    color: "#212529",
   },
   insulinLabel: {
     fontSize: 14,
@@ -362,7 +374,7 @@ const styles = StyleSheet.create({
     color: "#374151",
   },
   submitButton: {
-    backgroundColor: "#139C8B",
+    backgroundColor: "#212529",
     padding: 10,
     borderRadius: 50,
     alignItems: "center",
