@@ -269,8 +269,8 @@ const styles = StyleSheet.create({
     color: "#139C8B",
   },
   scrollViewContent: {
-    padding: 24,
-    paddingBottom: 40,
+    padding: 20,
+    paddingBottom: 80,
   },
   card: {
     backgroundColor: "white",
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: "#e0f2fe",
-    gap: 20,
+    gap: 18,
   },
   cardHeader: {
     flexDirection: "row",

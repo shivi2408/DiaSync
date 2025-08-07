@@ -4,25 +4,27 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   TouchableOpacity,
+  Platform,
 } from "react-native";
+import { Link } from "expo-router";
 import {
   Feather,
   FontAwesome5,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { MapPin, Edit2, Plus } from "lucide-react-native";
+import * as Location from "expo-location";
 import BottomMenu from "../components/BottomMenu";
+import Avatar from "../components/Avatar";
 import usePatientData from "../hooks/usePatientData";
 import useEntries from "../hooks/useEntries";
-import * as Location from 'expo-location';
 
 export default function HomeScreen() {
   const { patientData, isLoading } = usePatientData();
   const { entries, isLoading: isLoadingEntries } = useEntries();
   const [greeting, setGreeting] = useState("Good morning");
-  const [location, setLocation] = useState("Loading location...");
+  const [location, setLocation] = useState("Permission denied");
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -36,7 +38,7 @@ export default function HomeScreen() {
 
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         setLocation("Permission denied");
         return;
       }
@@ -44,9 +46,12 @@ export default function HomeScreen() {
       try {
         let location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
-        
+
         // Reverse geocode to get city name
-        const geocode = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const geocode = await Location.reverseGeocodeAsync({
+          latitude,
+          longitude,
+        });
         if (geocode[0]?.city && geocode[0]?.region) {
           setLocation(`${geocode[0].city}, ${geocode[0].region}`);
         } else {
@@ -76,27 +81,30 @@ export default function HomeScreen() {
   }
 
   // Calculate today's date
-  const todayDate = new Date().toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
+  const todayDate = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
   });
 
-  // Get recent entries (sorted by date, newest first)
   const recentEntries = entries
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 2); // Show only the 3 most recent entries
+    .slice(0, 3);
 
-  // Calculate today's average blood sugar
-  const todayEntries = entries.filter(entry => {
+  const todayEntries = entries.filter((entry) => {
     const entryDate = new Date(entry.date).toDateString();
     return entryDate === new Date().toDateString();
   });
 
-  const todayAverage = todayEntries.length > 0
-    ? (todayEntries.reduce((sum, entry) => sum + parseFloat(entry.bloodSugar), 0) / todayEntries.length).toFixed(1)
-    : null;
-
+  const todayAverage =
+    todayEntries.length > 0
+      ? (
+          todayEntries.reduce(
+            (sum, entry) => sum + parseFloat(entry.bloodSugar),
+            0
+          ) / todayEntries.length
+        ).toFixed(1)
+      : null;
 
   return (
     <View style={styles.container}>
@@ -104,10 +112,7 @@ export default function HomeScreen() {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.userInfo}>
-            <Image
-              source={{ uri: "../../assets/images/react-logo.png" }}
-              style={styles.avatar}
-            />
+            <Avatar name={patientData.name} size={50} borderColor="#139C8B" />
             <View>
               <Text style={styles.greeting}>{greeting}!</Text>
               <Text style={styles.userName}>{patientData.name}</Text>
@@ -119,49 +124,86 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Search Bar */}
-        {/* <View style={styles.searchContainer}>
-          <Feather name="search" size={20} color="#9ca3af" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search entries, reports, etc."
-            placeholderTextColor="#9ca3af"
-          />
-          <TouchableOpacity style={styles.micButton}>
-            <Feather name="mic" size={20} color="white" />
-          </TouchableOpacity>
-        </View> */}
-
         {/* Daily Overview */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Overview</Text>
+            <Text style={styles.sectionTitle}>Today&apos;s Overview</Text>
             <Text style={styles.sectionDate}>{todayDate}</Text>
           </View>
           <View style={styles.dailySummaryGrid}>
             <View style={styles.summaryCard}>
-              <MaterialCommunityIcons name="blood-bag" size={24} color="#075985" />
+              <View style={styles.iconContainer}>
+                <View
+                  style={[
+                    styles.iconBackground,
+                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
+                  ]}>
+                  <MaterialCommunityIcons
+                    name="blood-bag"
+                    size={24}
+                    color="#0084d1ff"
+                  />
+                </View>
+              </View>
               <Text style={styles.summaryLabel}>Blood Sugar</Text>
               <Text style={styles.summaryValue}>
-                {todayAverage ? `${todayAverage} mg/dL` : 'No data'}
+                {todayAverage ? `${todayAverage} mg/dL` : "No data"}
               </Text>
             </View>
             <View style={styles.summaryCard}>
-              <FontAwesome5 name="syringe" size={24} color="#075985" />
-              <Text style={styles.summaryLabel}>Today's Insulin</Text>
+              <View style={styles.iconContainer}>
+                <View
+                  style={[
+                    styles.iconBackground,
+                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
+                  ]}>
+                  <FontAwesome5 name="syringe" size={24} color="#075985" />
+                </View>
+              </View>
+              <Text style={styles.summaryLabel}>Today&apos;s Insulin</Text>
               <Text style={styles.summaryValue}>
-                {todayEntries.length > 0 
-                  ? todayEntries.reduce((count, entry) => count + entry.insulinEntries.length, 0)
-                  : 0} doses
+                {todayEntries.length > 0
+                  ? todayEntries.reduce(
+                      (count, entry) => count + entry.insulinEntries.length,
+                      0
+                    )
+                  : 0}{" "}
+                doses
               </Text>
             </View>
             <View style={styles.summaryCard}>
-              <MaterialCommunityIcons name="food-apple" size={24} color="#075985" />
+              <View style={styles.iconContainer}>
+                <View
+                  style={[
+                    styles.iconBackground,
+                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
+                  ]}>
+                  <MaterialCommunityIcons
+                    name="food-apple"
+                    size={24}
+                    color="#fd9494ff"
+                  />
+                </View>
+              </View>
               <Text style={styles.summaryLabel}>Diabetes Type</Text>
-              <Text style={styles.summaryValue}>Type {patientData.diabetesType}</Text>
+              <Text style={styles.summaryValue}>
+                Type {patientData.diabetesType}
+              </Text>
             </View>
             <View style={styles.summaryCard}>
-              <MaterialCommunityIcons name="calendar" size={24} color="#075985" />
+              <View style={styles.iconContainer}>
+                <View
+                  style={[
+                    styles.iconBackground,
+                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
+                  ]}>
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={24}
+                    color="#472a03ff"
+                  />
+                </View>
+              </View>
               <Text style={styles.summaryLabel}>Diagnosed</Text>
               <Text style={styles.summaryValue}>{patientData.startYear}</Text>
             </View>
@@ -172,8 +214,10 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Entries</Text>
-            <Link href="/screens/ReportScreen" style={styles.viewAll}>
-              View All
+            <Link href="/screens/ReportScreen" asChild>
+              <TouchableOpacity>
+                <Text style={styles.viewAll}>View All</Text>
+              </TouchableOpacity>
             </Link>
           </View>
 
@@ -183,7 +227,10 @@ export default function HomeScreen() {
                 <View key={entry.id} style={styles.entryCard}>
                   <View style={styles.entryHeader}>
                     <Text style={styles.entryTime}>
-                      {new Date(entry.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(entry.date).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </Text>
                     <Text style={styles.entryBloodSugar}>
                       {entry.bloodSugar} mg/dL
@@ -191,15 +238,18 @@ export default function HomeScreen() {
                   </View>
                   {entry.insulinEntries.length > 0 && (
                     <View style={styles.insulinContainer}>
-                      <FontAwesome5 name="syringe" size={16} color="#4b5563" />
+                      <View style={styles.syringeIconSmall} />
                       <Text style={styles.insulinText}>
-                        {entry.insulinEntries.map(ins => `${ins.type} (${ins.amount}u)`).join(', ')}
+                        {entry.insulinEntries
+                          .map((ins) => `${ins.type} (${ins.amount}u)`)
+                          .join(", ")}
                       </Text>
                     </View>
                   )}
                   {entry.notes && (
                     <Text style={styles.entryNotes} numberOfLines={2}>
-                      <Feather name="edit-2" size={14} color="#4b5563" /> {entry.notes}
+                      <Feather name="edit-2" size={14} color="#4b5563" />{" "}
+                      {entry.notes}
                     </Text>
                   )}
                 </View>
@@ -207,18 +257,12 @@ export default function HomeScreen() {
             </View>
           ) : (
             <View style={styles.emptyState}>
-              <MaterialCommunityIcons 
-                name="clipboard-text-outline" 
-                size={48} 
-                color="#9CA3AF" 
-              />
+              <View style={styles.emptyStateIcon} />
               <Text style={styles.emptyStateText}>No entries recorded yet</Text>
-              <Link href="/screens/EntryScreen" asChild>
-                <TouchableOpacity style={styles.addEntryButton}>
-                  <Feather name="plus" size={20} color="white" />
-                  <Text style={styles.addEntryButtonText}>Add First Entry</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity style={styles.addEntryButton}>
+                <Feather name="plus" size={20} color="white" />
+                <Text style={styles.addEntryButtonText}>Add First Entry</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -231,10 +275,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f0f9ff",
+    backgroundColor: "#F9FAFB",
   },
   scrollViewContent: {
-    padding: 24,
+    padding: 20,
     gap: 24,
     paddingBottom: 100, // Space for bottom menu
   },
@@ -242,27 +286,33 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 8,
   },
   userInfo: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 14,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: "#139C8B",
+    backgroundColor: "#EEF2FF",
+  },
+  avatarText: {
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#139C8B",
   },
   greeting: {
     fontSize: 16,
-    color: "#4b5563",
+    color: "#6B7280",
+    marginBottom: 2,
   },
   userName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#075985",
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#111827",
   },
   locationContainer: {
     flexDirection: "row",
@@ -272,50 +322,42 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.1)",
+      },
+    }),
   },
   location: {
     fontSize: 14,
-    color: "#4b5563",
-  },
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    paddingVertical: 4,
-    color: "#374151",
-  },
-  micButton: {
-    backgroundColor: "#075985",
-    borderRadius: 8,
-    padding: 8,
+    color: "#6B7280",
   },
   section: {
-    gap: 16,
+    gap: 13,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 4,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#075985",
+    fontWeight: "700",
+    color: "#111827",
   },
   sectionDate: {
     fontSize: 16,
-    color: "#4b5563",
+    color: "#6B7280",
     fontWeight: "500",
   },
   viewAll: {
@@ -331,34 +373,81 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     width: "48%",
     alignItems: "center",
     gap: 8,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
+  },
+  iconContainer: {
+    marginBottom: 4,
+  },
+  iconBackground: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  syringeIconSmall: {
+    width: 13,
+    height: 13,
+    backgroundColor: "#c1e6ffff",
+    borderRadius: 2,
   },
   summaryLabel: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#6B7280",
     textAlign: "center",
   },
   summaryValue: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#075985",
+    fontWeight: "700",
+    color: "#111827",
     textAlign: "center",
   },
   emptyState: {
     backgroundColor: "white",
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 40,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
     gap: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
+  },
+  emptyStateIcon: {
+    width: 48,
+    height: 48,
+    backgroundColor: "#E5E7EB",
+    borderRadius: 24,
   },
   emptyStateText: {
     fontSize: 16,
@@ -368,7 +457,7 @@ const styles = StyleSheet.create({
   addEntryButton: {
     backgroundColor: "#139C8B",
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
@@ -376,31 +465,44 @@ const styles = StyleSheet.create({
   addEntryButtonText: {
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   entriesContainer: {
     gap: 12,
   },
   entryCard: {
     backgroundColor: "white",
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
+    borderRadius: 16,
+    padding: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   entryHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   entryTime: {
     fontSize: 16,
-    color: "#4b5563",
+    color: "#6B7280",
+    fontWeight: "500",
   },
   entryBloodSugar: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#075985",
+    fontWeight: "700",
+    color: "#139C8B",
   },
   insulinContainer: {
     flexDirection: "row",
@@ -410,11 +512,86 @@ const styles = StyleSheet.create({
   },
   insulinText: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#6B7280",
   },
   entryNotes: {
     fontSize: 14,
-    color: "#4b5563",
+    color: "#6B7280",
     fontStyle: "italic",
+  },
+  bottomMenu: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 12,
+    paddingBottom: Platform.OS === "ios" ? 28 : 12,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+      },
+    }),
+  },
+  menuItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  menuItemContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  menuIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  homeIcon: {
+    width: 20,
+    height: 20,
+    backgroundColor: "#139C8B",
+    borderRadius: 4,
+  },
+  statsIcon: {
+    width: 20,
+    height: 20,
+    backgroundColor: "#9CA3AF",
+    borderRadius: 4,
+  },
+  settingsIcon: {
+    width: 20,
+    height: 20,
+    backgroundColor: "#9CA3AF",
+    borderRadius: 4,
+  },
+  menuText: {
+    fontSize: 12,
+    color: "#9CA3AF",
+  },
+  activeMenuItem: {
+    backgroundColor: "rgba(129, 129, 129, 0.1)",
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  activeMenuText: {
+    color: "#139C8B",
+    fontWeight: "600",
   },
 });

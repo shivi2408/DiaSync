@@ -1,28 +1,58 @@
 // app/screens/WelcomeScreen.tsx
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import {
-  MaterialCommunityIcons,
-  FontAwesome5,
+import { 
+  MaterialCommunityIcons, 
+  FontAwesome5, 
   Feather,
 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import usePatientData from "../hooks/usePatientData";
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { patientData, isLoading } = usePatientData();
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     if (!isLoading && patientData) {
-      router.replace("/screens/HomeScreen");
+      const timer = setTimeout(() => {
+        router.replace("/screens/HomeScreen");
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
   }, [isLoading, patientData]);
 
-  if (isLoading || patientData) {
-    return null; // or a loading spinner
+  // Show nothing while loading or if patient data exists and welcome time is over
+  if (isLoading || (patientData && !showWelcome)) {
+    return null;
   }
 
+  // If we have patient data but still in welcome period, show welcome screen
+  if (patientData) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.mainContent}>
+          <View style={styles.header}>
+            <Image
+              source={require("../../assets/images/adaptive-icon.png")}
+              style={styles.logo}
+            />
+            <Text style={styles.appName}>GlucoBuddy</Text>
+          </View>
+          <View style={styles.content}>
+            <Text style={styles.tagline}>Welcome back!</Text>
+            <Text style={styles.subTagline}>
+              Loading your diabetes care dashboard...
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // Show the full welcome screen for new users
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
@@ -33,14 +63,12 @@ export default function WelcomeScreen() {
           />
           <Text style={styles.appName}>GlucoBuddy</Text>
         </View>
-
         <View style={styles.content}>
           <Text style={styles.tagline}>Your assistant in diabetes care</Text>
           <Text style={styles.subTagline}>
             Take control of your health together with GlucoBuddy
           </Text>
         </View>
-
         <View style={styles.features}>
           <View style={styles.featureItem}>
             <MaterialCommunityIcons
@@ -60,10 +88,10 @@ export default function WelcomeScreen() {
           </View>
         </View>
       </View>
-
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push("/screens/PatientSetupScreen")}>
+        onPress={() => router.push("/screens/PatientSetupScreen")}
+      >
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>
@@ -76,7 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f9ff",
     padding: 32,
     gap: 20,
-    justifyContent: "space-between", // This pushes content to top and button to bottom
+    justifyContent: "space-between",
   },
   mainContent: {
     gap: 40,
