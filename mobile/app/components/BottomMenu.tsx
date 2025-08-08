@@ -7,7 +7,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['#2b2b2bfa', '#333333f6', '#2b2b2bfa']}
+        colors={['#1a1a1ad2', '#1f1f1fe0', '#1a1a1ad2']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.container}

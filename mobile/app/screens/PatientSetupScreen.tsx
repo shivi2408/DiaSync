@@ -4,32 +4,39 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Platform,
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { AntDesign, Feather, FontAwesome6  } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import { AntDesign, Feather, FontAwesome6 } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import usePatientData from "../hooks/usePatientData";
+
+interface Insulin {
+  name: string;
+  timings: string[];
+  selectedTimings: string[];
+  customTiming: string;
+}
 
 export default function PatientSetupScreen() {
   const router = useRouter();
   const { savePatientData } = usePatientData();
   const params = useLocalSearchParams();
   const isEditMode = params.mode === "edit";
-  const [newTiming, setNewTiming] = useState("");
 
   // Parse the insulins if they exist in params
   const initialInsulins = params.insulins
-    ? JSON.parse(params.insulins as string)
+    ? JSON.parse(params.insulins as string).map((insulin: any) => ({
+        ...insulin,
+        selectedTimings: [],
+        customTiming: ""
+      }))
     : [];
 
-  const [insulins, setInsulins] = useState<
-    Array<{
-      name: string;
-      timings: string[];
-    }>
-  >(initialInsulins);
+  const [insulins, setInsulins] = useState<Insulin[]>(initialInsulins);
 
   const [patientDetails, setPatientDetails] = useState({
     name: (params.name as string) || "",
@@ -45,12 +52,21 @@ export default function PatientSetupScreen() {
   // Handle case when params are loaded after component mounts
   useEffect(() => {
     if (isEditMode && params.insulins) {
-      setInsulins(JSON.parse(params.insulins as string));
+      setInsulins(
+        JSON.parse(params.insulins as string).map((insulin: any) => ({
+          ...insulin,
+          selectedTimings: [],
+          customTiming: ""
+        }))
+      );
     }
   }, [params.insulins]);
 
   const addInsulin = () => {
-    setInsulins([...insulins, { name: "", timings: [] }]);
+    setInsulins([
+      ...insulins,
+      { name: "", timings: [], selectedTimings: [], customTiming: "" },
+    ]);
   };
 
   const updateInsulinName = (index: number, name: string) => {
@@ -59,18 +75,24 @@ export default function PatientSetupScreen() {
     setInsulins(newInsulins);
   };
 
-  const addNewTiming = (insulinIndex: number) => {
-    if (newTiming.trim()) {
-      const newInsulins = [...insulins];
-      newInsulins[insulinIndex].timings.push(newTiming);
-      setInsulins(newInsulins);
-      setNewTiming("");
-    }
-  };
-
   const deleteTiming = (insulinIndex: number, timingIndex: number) => {
     const newInsulins = [...insulins];
     newInsulins[insulinIndex].timings.splice(timingIndex, 1);
+    setInsulins(newInsulins);
+  };
+
+  const handleTimingSelection = (insulinIndex: number, timing: string) => {
+    const newInsulins = [...insulins];
+    const insulin = newInsulins[insulinIndex];
+
+    if (insulin.selectedTimings.includes(timing)) {
+      insulin.selectedTimings = insulin.selectedTimings.filter(
+        (t) => t !== timing
+      );
+    } else {
+      insulin.selectedTimings = [...insulin.selectedTimings, timing];
+    }
+
     setInsulins(newInsulins);
   };
 
@@ -79,22 +101,42 @@ export default function PatientSetupScreen() {
   };
 
   const completeSetup = async () => {
+    // First, add all pending selections to timings
+    const updatedInsulins = insulins.map((insulin) => {
+      const newTimings = [
+        ...insulin.timings,
+        ...insulin.selectedTimings.filter(
+          (t) => !insulin.timings.includes(t)
+        ),
+        ...(insulin.customTiming.trim() ? [insulin.customTiming] : []),
+      ];
+
+      return {
+        ...insulin,
+        timings: newTimings,
+        selectedTimings: [],
+        customTiming: "",
+      };
+    });
+
     const data = {
       ...patientDetails,
-      insulins: insulins.filter((insulin) => insulin.name.trim() !== ""),
+      insulins: updatedInsulins.filter((insulin) => insulin.name.trim() !== ""),
     };
+
     await savePatientData(data);
     router.push("/screens/DetailsScreen");
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* New Header with Back Button */}
+      {/* Header with Back Button */}
       <View style={styles.headerContainer}>
         {isEditMode ? (
           <TouchableOpacity
             onPress={() => router.push("/screens/DetailsScreen")}
-            style={styles.backButton}>
+            style={styles.backButton}
+          >
             <Feather name="chevron-left" size={24} color="#212529" />
           </TouchableOpacity>
         ) : (
@@ -112,16 +154,16 @@ export default function PatientSetupScreen() {
         </View>
         <TouchableOpacity
           onPress={completeSetup}
-          style={styles.headerCompleteButton}>
+          style={styles.headerCompleteButton}
+        >
           <Text style={styles.headerCompleteButtonText}>
             {isEditMode ? "Update" : "Done"}
           </Text>
         </TouchableOpacity>
       </View>
 
-        <Text style={styles.sectionTitle}>Personal Information</Text>
+      <Text style={styles.sectionTitle}>Personal Information</Text>
       <View style={styles.section}>
-
         <View style={styles.formGroup}>
           <Text style={styles.label}>Full Name</Text>
           <TextInput
@@ -147,20 +189,27 @@ export default function PatientSetupScreen() {
           </View>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Gender</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Male"
-              placeholderTextColor="#acacac"
-              value={patientDetails.gender}
-              onChangeText={(text) => handleInputChange("gender", text)}
-            />
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={patientDetails.gender}
+                onValueChange={(itemValue) =>
+                  handleInputChange("gender", itemValue)
+                }
+                style={styles.picker}
+                dropdownIconColor="#acacac"
+              >
+                <Picker.Item label="Select gender" value="" />
+                <Picker.Item label="Male" value="Male" />
+                <Picker.Item label="Female" value="Female" />
+                <Picker.Item label="Other" value="Other" />
+              </Picker>
+            </View>
           </View>
         </View>
       </View>
 
-<Text style={styles.sectionTitle}>Diabetes Information</Text>
+      <Text style={styles.sectionTitle}>Diabetes Information</Text>
       <View style={styles.section}>
-        
         <View style={styles.row}>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Diabetes Type</Text>
@@ -171,13 +220,15 @@ export default function PatientSetupScreen() {
                   patientDetails.diabetesType === "1" &&
                     styles.radioButtonSelected,
                 ]}
-                onPress={() => handleInputChange("diabetesType", "1")}>
+                onPress={() => handleInputChange("diabetesType", "1")}
+              >
                 <Text
                   style={
                     patientDetails.diabetesType === "1"
                       ? styles.radioTextSelected
                       : styles.radioText
-                  }>
+                  }
+                >
                   Type 1
                 </Text>
               </TouchableOpacity>
@@ -187,13 +238,15 @@ export default function PatientSetupScreen() {
                   patientDetails.diabetesType === "2" &&
                     styles.radioButtonSelected,
                 ]}
-                onPress={() => handleInputChange("diabetesType", "2")}>
+                onPress={() => handleInputChange("diabetesType", "2")}
+              >
                 <Text
                   style={
                     patientDetails.diabetesType === "2"
                       ? styles.radioTextSelected
                       : styles.radioText
-                  }>
+                  }
+                >
                   Type 2
                 </Text>
               </TouchableOpacity>
@@ -238,13 +291,12 @@ export default function PatientSetupScreen() {
         </View>
       </View>
 
-<Text style={styles.sectionTitle}>Insulin Types & Times</Text>
+      <Text style={styles.sectionTitle}>Insulin Types & Times</Text>
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.label}>Insulin </Text>
-          {/* Changed to small plus button */}
           <TouchableOpacity onPress={addInsulin} style={styles.smallAddButton}>
-            <FontAwesome6  name="add" size={16} color="#212529" />
+            <FontAwesome6 name="add" size={16} color="#212529" />
           </TouchableOpacity>
         </View>
         {insulins.map((insulin, insulinIndex) => (
@@ -263,27 +315,63 @@ export default function PatientSetupScreen() {
                   <Text style={styles.timingText}>{timing}</Text>
                   <TouchableOpacity
                     onPress={() => deleteTiming(insulinIndex, timingIndex)}
-                    style={styles.deletePillButton}>
+                    style={styles.deletePillButton}
+                  >
                     <Feather name="x" size={12} color="#962c2cff" />
                   </TouchableOpacity>
                 </View>
               ))}
             </View>
 
-            <View style={styles.addTimingContainer}>
+            <View style={styles.timingSelectionContainer}>
+              <Text style={styles.timingSectionTitle}>Select Times:</Text>
+
+              <View style={styles.timingOptionsContainer}>
+                {["Breakfast", "Lunch", "Dinner"].map((timing) => (
+                  <TouchableOpacity
+                    key={timing}
+                    style={[
+                      styles.timingOption,
+                      insulin.selectedTimings.includes(timing) &&
+                        styles.selectedTimingOption,
+                      insulin.timings.includes(timing) &&
+                        styles.alreadyAddedTiming,
+                    ]}
+                    onPress={() => handleTimingSelection(insulinIndex, timing)}
+                    disabled={insulin.timings.includes(timing)}
+                  >
+                    <Text
+                      style={[
+                        styles.timingOptionText,
+                        insulin.selectedTimings.includes(timing) &&
+                          styles.selectedTimingOptionText,
+                      ]}
+                    >
+                      {timing}
+                    </Text>
+                    {insulin.timings.includes(timing) && (
+                      <Feather
+                        name="check"
+                        size={12}
+                        color="#16a34a"
+                        style={styles.addedIcon}
+                      />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               <TextInput
                 style={styles.newTimingInput}
-                placeholder="Time (e.g., Morning, Evening)"
+                placeholder="Custom time (e.g., Bedtime)"
                 placeholderTextColor="#acacac"
-                value={newTiming}
-                onChangeText={setNewTiming}
-                onSubmitEditing={() => addNewTiming(insulinIndex)}
+                value={insulin.customTiming}
+                onChangeText={(text) => {
+                  const newInsulins = [...insulins];
+                  newInsulins[insulinIndex].customTiming = text;
+                  setInsulins(newInsulins);
+                }}
               />
-              <TouchableOpacity
-                style={styles.addTimingButton}
-                onPress={() => addNewTiming(insulinIndex)}>
-                <Text style={styles.addTimingButtonText}>Add</Text>
-              </TouchableOpacity>
             </View>
           </View>
         ))}
@@ -308,8 +396,8 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-   emptyBackButtonPlaceholder: {
-    width: 40, 
+  emptyBackButtonPlaceholder: {
+    width: 40,
   },
   headerTextContainer: {
     flex: 1,
@@ -332,9 +420,21 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 16,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
     gap: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   sectionHeader: {
     flexDirection: "row",
@@ -354,6 +454,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "500",
     color: "#212529",
+  },
+  pickerContainer: {
+    backgroundColor: "#f8fafc",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0f2fe",
+    overflow: "hidden",
+  },
+  picker: {
+    height: 40,
+    width: "100%",
+    color: "#5a5a5a",
   },
   input: {
     backgroundColor: "#f8fafc",
@@ -419,32 +531,61 @@ const styles = StyleSheet.create({
   deletePillButton: {
     marginLeft: 6,
   },
-  addTimingContainer: {
-    flexDirection: "row",
+  timingSelectionContainer: {
+    marginTop: 12,
     gap: 8,
   },
+  timingSectionTitle: {
+    fontSize: 13,
+    color: "#4b5563",
+    fontWeight: "500",
+  },
+  timingOptionsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  timingOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    backgroundColor: "#f8fafc",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  selectedTimingOption: {
+    backgroundColor: "#e0f2fe",
+    borderColor: "#7dd3fc",
+  },
+  alreadyAddedTiming: {
+    backgroundColor: "#f0fdf4",
+    borderColor: "#bbf7d0",
+  },
+  timingOptionText: {
+    color: "#64748b",
+    fontSize: 13,
+  },
+  selectedTimingOptionText: {
+    color: "#0369a1",
+    fontWeight: "500",
+  },
+  addedIcon: {
+    marginLeft: 4,
+  },
   newTimingInput: {
-    flex: 1,
     backgroundColor: "#f8fafc",
     color: "#5a5a5a",
-    padding: 8,
+    padding: 10,
     borderRadius: 8,
     fontSize: 14,
     borderWidth: 1,
     borderColor: "#e0f2fe",
-  },
-  addTimingButton: {
-    backgroundColor: "#212529",
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    justifyContent: "center",
-  },
-  addTimingButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    width: "100%",
   },
   smallAddButton: {
-    padding:8,
+    padding: 8,
     borderRadius: 8,
     backgroundColor: "#e0f2fe",
   },

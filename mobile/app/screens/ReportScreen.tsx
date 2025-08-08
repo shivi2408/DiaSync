@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Platform,
   TouchableOpacity,
   Alert,
 } from "react-native";
@@ -129,15 +130,14 @@ export default function ReportScreen() {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.card}>
           <View style={styles.header}>
-          <TouchableOpacity 
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Feather name="chevron-left" size={24} color="#212529" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Monthly Report</Text>
-          <View style={styles.headerRightPlaceholder} />
-        </View>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}>
+              <Feather name="chevron-left" size={24} color="#212529" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Monthly Report</Text>
+            <View style={styles.headerRightPlaceholder} />
+          </View>
 
           <View style={styles.monthSelector}>
             <Feather name="calendar" size={18} color="#212529" />
@@ -279,19 +279,19 @@ const styles = StyleSheet.create({
     borderColor: "#e0f2fe",
     gap: 20,
   },
-    header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   backButton: {
     padding: 8,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#212529',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#212529",
+    textAlign: "center",
     flex: 1,
   },
   headerRightPlaceholder: {
@@ -301,6 +301,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   cardTitle: {
     fontSize: 20,

@@ -78,7 +78,6 @@ export default function HomeScreen() {
   if (!patientData) {
     return (
       <View style={styles.container}>
-
         {/* Centered no data content */}
         <View style={styles.noDataContainer}>
           <View style={styles.noDataContent}>
@@ -281,10 +280,12 @@ export default function HomeScreen() {
             <View style={styles.emptyState}>
               <View style={styles.emptyStateIcon} />
               <Text style={styles.emptyStateText}>No entries recorded yet</Text>
-              <TouchableOpacity style={styles.addEntryButton}>
-                <Feather name="plus" size={20} color="white" />
-                <Text style={styles.addEntryButtonText}>Add First Entry</Text>
-              </TouchableOpacity>
+              <Link href="/screens/EntryScreen" asChild>
+                <TouchableOpacity style={styles.addEntryButton}>
+                  <Feather name="plus" size={20} color="white" />
+                  <Text style={styles.addEntryButtonText}>Add First Entry</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           )}
         </View>
