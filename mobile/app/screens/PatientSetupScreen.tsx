@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { AntDesign, Feather, FontAwesome6  } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import usePatientData from "../hooks/usePatientData";
@@ -89,19 +89,39 @@ export default function PatientSetupScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>
-          {isEditMode ? "Edit Patient Details" : "Patient Setup"}
-        </Text>
-        <Text style={styles.subtitle}>
-          {isEditMode
-            ? "Update your diabetes care profile"
-            : "Let's set up your diabetes care profile"}
-        </Text>
+      {/* New Header with Back Button */}
+      <View style={styles.headerContainer}>
+        {isEditMode ? (
+          <TouchableOpacity
+            onPress={() => router.push("/screens/DetailsScreen")}
+            style={styles.backButton}>
+            <Feather name="chevron-left" size={24} color="#212529" />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.emptyBackButtonPlaceholder} />
+        )}
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.title}>
+            {isEditMode ? "Edit Patient Details" : "Patient Setup"}
+          </Text>
+          <Text style={styles.subtitle}>
+            {isEditMode
+              ? "Update your diabetes care profile"
+              : "Let's set up your diabetes care profile"}
+          </Text>
+        </View>
+        <TouchableOpacity
+          onPress={completeSetup}
+          style={styles.headerCompleteButton}>
+          <Text style={styles.headerCompleteButtonText}>
+            {isEditMode ? "Update" : "Done"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.section}>
         <Text style={styles.sectionTitle}>Personal Information</Text>
+      <View style={styles.section}>
+
         <View style={styles.formGroup}>
           <Text style={styles.label}>Full Name</Text>
           <TextInput
@@ -138,8 +158,9 @@ export default function PatientSetupScreen() {
         </View>
       </View>
 
+<Text style={styles.sectionTitle}>Diabetes Information</Text>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Diabetes Information</Text>
+        
         <View style={styles.row}>
           <View style={styles.formGroup}>
             <Text style={styles.label}>Diabetes Type</Text>
@@ -217,8 +238,15 @@ export default function PatientSetupScreen() {
         </View>
       </View>
 
+<Text style={styles.sectionTitle}>Insulin Types & Times</Text>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Insulin Types & Times</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.label}>Insulin </Text>
+          {/* Changed to small plus button */}
+          <TouchableOpacity onPress={addInsulin} style={styles.smallAddButton}>
+            <FontAwesome6  name="add" size={16} color="#212529" />
+          </TouchableOpacity>
+        </View>
         {insulins.map((insulin, insulinIndex) => (
           <View key={insulinIndex} style={styles.insulinCard}>
             <TextInput
@@ -259,18 +287,7 @@ export default function PatientSetupScreen() {
             </View>
           </View>
         ))}
-
-        <TouchableOpacity style={styles.addInsulinButton} onPress={addInsulin}>
-          <MaterialCommunityIcons name="needle" size={20} color="white" />
-          <Text style={styles.addInsulinButtonText}>Add Insulin Type</Text>
-        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.completeButton} onPress={completeSetup}>
-        <Text style={styles.completeButtonText}>
-          {isEditMode ? "Update Profile" : "Complete Setup"}
-        </Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -283,17 +300,31 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingBottom: 40,
   },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  backButton: {
+    padding: 8,
+  },
+   emptyBackButtonPlaceholder: {
+    width: 40, 
+  },
+  headerTextContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
   header: {
     gap: 8,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#139686",
-    textAlign: "center",
+    color: "#212529",
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#4b5563",
     textAlign: "center",
   },
@@ -305,8 +336,13 @@ const styles = StyleSheet.create({
     borderColor: "#e0f2fe",
     gap: 16,
   },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
     color: "#212529",
   },
@@ -315,16 +351,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "500",
     color: "#212529",
   },
   input: {
     backgroundColor: "#f8fafc",
     color: "#5a5a5a",
-    padding: 12,
+    padding: 9,
     borderRadius: 8,
-    fontSize: 16,
+    fontSize: 14,
     borderWidth: 1,
     borderColor: "#e0f2fe",
   },
@@ -338,7 +374,7 @@ const styles = StyleSheet.create({
   },
   radioButton: {
     flex: 1,
-    padding: 12,
+    padding: 9,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#cbd5e1",
@@ -346,7 +382,6 @@ const styles = StyleSheet.create({
   },
   radioButtonSelected: {
     backgroundColor: "#e0f2fe",
-    borderColor: "#212529",
   },
   radioText: {
     color: "#64748b",
@@ -356,7 +391,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   insulinCard: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#ffffffff",
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
@@ -379,7 +414,7 @@ const styles = StyleSheet.create({
   },
   timingText: {
     color: "#212529",
-    fontSize: 14,
+    fontSize: 12,
   },
   deletePillButton: {
     marginLeft: 6,
@@ -392,9 +427,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8fafc",
     color: "#5a5a5a",
-    padding: 12,
+    padding: 8,
     borderRadius: 8,
-    fontSize: 16,
+    fontSize: 14,
     borderWidth: 1,
     borderColor: "#e0f2fe",
   },
@@ -408,29 +443,18 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-  addInsulinButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: 14,
-    backgroundColor: "#212529",
+  smallAddButton: {
+    padding:8,
     borderRadius: 8,
+    backgroundColor: "#e0f2fe",
   },
-  addInsulinButtonText: {
+  headerCompleteButton: {
+    backgroundColor: "#050505d8",
+    padding: 7,
+    borderRadius: 50,
+  },
+  headerCompleteButtonText: {
     color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  completeButton: {
-    backgroundColor: "#212529",
-    padding: 16,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  completeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 12,
   },
 });

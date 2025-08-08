@@ -6,13 +6,16 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import { Link } from "expo-router";
 import {
   Feather,
   FontAwesome5,
   MaterialCommunityIcons,
+  Fontisto,
 } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import * as Location from "expo-location";
 import BottomMenu from "../components/BottomMenu";
 import Avatar from "../components/Avatar";
@@ -20,6 +23,7 @@ import usePatientData from "../hooks/usePatientData";
 import useEntries from "../hooks/useEntries";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const { patientData, isLoading } = usePatientData();
   const { entries, isLoading: isLoadingEntries } = useEntries();
   const [greeting, setGreeting] = useState("Good morning");
@@ -65,8 +69,8 @@ export default function HomeScreen() {
 
   if (isLoading || isLoadingEntries) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#8ec1e2ff" />
       </View>
     );
   }
@@ -74,7 +78,26 @@ export default function HomeScreen() {
   if (!patientData) {
     return (
       <View style={styles.container}>
-        <Text>No patient data found</Text>
+
+        {/* Centered no data content */}
+        <View style={styles.noDataContainer}>
+          <View style={styles.noDataContent}>
+            <MaterialCommunityIcons
+              name="account-question"
+              size={48}
+              color="#8ec1e2ff"
+            />
+            <Text style={styles.noDataTitle}>No Patient Data Found</Text>
+            <Text style={styles.noDataMessage}>
+              Please set up your patient profile to continue
+            </Text>
+            <TouchableOpacity
+              style={styles.setupButton}
+              onPress={() => router.push("/screens/PatientSetupScreen")}>
+              <Text style={styles.setupButtonText}>Set Up Profile</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     );
   }
@@ -111,7 +134,7 @@ export default function HomeScreen() {
         {/* Header Section */}
         <View style={styles.header}>
           <View style={styles.userInfo}>
-            <Avatar name={patientData.name} size={50} borderColor="#212529" />
+            <Avatar name={patientData.name} size={40} />
             <View>
               <Text style={styles.greeting}>{greeting}!</Text>
               <Text style={styles.userName}>{patientData.name}</Text>
@@ -137,11 +160,7 @@ export default function HomeScreen() {
                     styles.iconBackground,
                     { backgroundColor: "rgba(129, 129, 129, 0.1)" },
                   ]}>
-                  <MaterialCommunityIcons
-                    name="blood-bag"
-                    size={24}
-                    color="#0084d1ff"
-                  />
+                  <Fontisto name="blood-drop" size={24} color="#a11135ff" />
                 </View>
               </View>
               <Text style={styles.summaryLabel}>Blood Sugar</Text>
@@ -156,7 +175,11 @@ export default function HomeScreen() {
                     styles.iconBackground,
                     { backgroundColor: "rgba(129, 129, 129, 0.1)" },
                   ]}>
-                  <FontAwesome5 name="syringe" size={24} color="#212529" />
+                  <Fontisto
+                    name="injection-syringe"
+                    size={24}
+                    color="#01488fff"
+                  />
                 </View>
               </View>
               <Text style={styles.summaryLabel}>Today&apos;s Insulin</Text>
@@ -178,9 +201,9 @@ export default function HomeScreen() {
                     { backgroundColor: "rgba(129, 129, 129, 0.1)" },
                   ]}>
                   <MaterialCommunityIcons
-                    name="food-apple"
+                    name="food-variant"
                     size={24}
-                    color="#fd9494ff"
+                    color="#00a15eff"
                   />
                 </View>
               </View>
@@ -197,9 +220,9 @@ export default function HomeScreen() {
                     { backgroundColor: "rgba(129, 129, 129, 0.1)" },
                   ]}>
                   <MaterialCommunityIcons
-                    name="calendar"
+                    name="diabetes"
                     size={24}
-                    color="#472a03ff"
+                    color="#aa6000ff"
                   />
                 </View>
               </View>
@@ -274,7 +297,53 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#f0f9ff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f9ff",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 100, // Account for bottom menu
+  },
+  noDataContent: {
+    alignItems: "center",
+    padding: 20,
+    width: "100%",
+  },
+  noDataTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+    color: "#212529",
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  noDataMessage: {
+    fontSize: 16,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: 24,
+    maxWidth: 300,
+  },
+  setupButton: {
+    backgroundColor: "#212529",
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+    borderRadius: 12,
+    width: "100%",
+    maxWidth: 200,
+  },
+  setupButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
   },
   scrollViewContent: {
     padding: 20,
@@ -347,7 +416,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
     color: "#111827",
   },
@@ -360,7 +429,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#838383ff",
     fontWeight: "600",
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
   dailySummaryGrid: {
     flexDirection: "row",
@@ -390,8 +459,7 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  iconContainer: {
-  },
+  iconContainer: {},
   iconBackground: {
     width: 44,
     height: 44,

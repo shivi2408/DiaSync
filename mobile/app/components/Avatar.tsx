@@ -12,13 +12,6 @@ const getInitials = (name: string) => {
     .substring(0, 2);
 };
 
-// Helper function to generate a random color
-const getRandomColor = (seed: string) => {
-  const colors = ["#eaffeeff", "#effffeff", "#e3fff2ff"];
-  const index = seed.charCodeAt(0) % colors.length;
-  return colors[index];
-};
-
 interface AvatarProps {
   name: string;
   size?: number;
@@ -31,7 +24,6 @@ const Avatar: React.FC<AvatarProps> = ({
   borderColor = "#212529",
 }) => {
   const initials = getInitials(name);
-  const backgroundColor = getRandomColor(name);
 
   return (
     <View
@@ -42,15 +34,13 @@ const Avatar: React.FC<AvatarProps> = ({
           height: size,
           borderRadius: size / 2,
           borderColor,
-          backgroundColor,
         },
       ]}>
       <Text
         style={[
           styles.avatarText,
           {
-            fontSize: size * 0.36,
-            color: borderColor, // Using borderColor for text color
+            fontSize: size * 0.5,
           },
         ]}>
         {initials}
@@ -64,9 +54,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
+    backgroundColor: "#000000", // Black background
   },
   avatarText: {
     fontWeight: "bold",
+    color: "#ffffff", // White text
   },
 });
 
