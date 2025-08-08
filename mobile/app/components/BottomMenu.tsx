@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather,AntDesign ,Entypo,Ionicons   } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -7,7 +7,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
   return (
     <View style={styles.wrapper}>
       <LinearGradient
-        colors={['#2b2b2bec', '#3b3b3bec', '#2b2b2bec']}
+        colors={['#2b2b2bfa', '#333333f6', '#2b2b2bfa']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.container}
@@ -18,9 +18,9 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               styles.iconContainer,
               activeScreen === "home" && styles.activeIconContainer
             ]}>
-              <Feather
+              <AntDesign 
                 name="home"
-                size={20}
+                size={22}
                 color={activeScreen === "home" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "home" && (
@@ -38,9 +38,9 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               styles.iconContainer,
               activeScreen === "entry" && styles.activeIconContainer
             ]}>
-              <Feather
-                name="calendar"
-                size={20}
+              <Ionicons  
+                name="add-circle-outline"
+                size={24}
                 color={activeScreen === "entry" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "entry" && (
@@ -60,7 +60,7 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
             ]}>
               <Feather
                 name="bar-chart"
-                size={20}
+                size={22}
                 color={activeScreen === "report" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "report" && (
@@ -78,9 +78,9 @@ export default function BottomMenu({ activeScreen = "home" }: { activeScreen?: s
               styles.iconContainer,
               activeScreen === "details" && styles.activeIconContainer
             ]}>
-              <Feather
-                name="settings"
-                size={20}
+              <AntDesign
+                name="setting"
+                size={22}
                 color={activeScreen === "details" ? "#2c2c2c" : "#fefefe"}
               />
               {activeScreen === "details" && (

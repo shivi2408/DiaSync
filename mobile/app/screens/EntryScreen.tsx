@@ -8,14 +8,16 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker"; // For dropdown
+import { Feather, FontAwesome6 ,Fontisto  } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import BottomMenu from "../components/BottomMenu";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 import useEntries from "../hooks/useEntries";
 import usePatientData from "../hooks/usePatientData";
+import { useNavigation } from "@react-navigation/native";
 
 export default function EntryScreen() {
+  const navigation = useNavigation();
   const [activeTab, setActiveTab] = useState("Entry");
   const [bloodSugar, setBloodSugar] = useState("");
   const [insulinEntries, setInsulinEntries] = useState([
@@ -95,18 +97,18 @@ export default function EntryScreen() {
       setNotes("");
 
       Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Entry added successfully!',
-        position: 'bottom',
+        type: "success",
+        text1: "Success",
+        text2: "Entry added successfully!",
+        position: "bottom",
         visibilityTime: 3000,
       });
     } catch (error) {
       Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to save entry. Please try again.',
-        position: 'bottom',
+        type: "error",
+        text1: "Error",
+        text2: "Failed to save entry. Please try again.",
+        position: "bottom",
         visibilityTime: 3000,
       });
       console.error(error);
@@ -116,19 +118,33 @@ export default function EntryScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {activeTab === "Entry" && (
+        <View style={styles.content}>
+          <View style={styles.header}>
+  <TouchableOpacity
+    onPress={() => navigation.goBack()}
+    style={styles.backButton}>
+    <Feather name="chevron-left" size={24} color="#212529" />
+  </TouchableOpacity>
+  <Text style={styles.headerTitle}>New Entry</Text>
+  <TouchableOpacity 
+    onPress={handleSubmit}
+    style={styles.headerAddButton}
+    disabled={isSaving}
+  >
+    <Text style={styles.headerAddButtonText}>
+      {isSaving ? "Saving..." : "Add"}
+    </Text>
+  </TouchableOpacity>
+</View>
+
           <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Feather name="plus" size={20} color="#212529" />
-              <Text style={styles.cardTitle}>New Entry</Text>
-            </View>
             <Text style={styles.cardSubtitle}>
               Record your blood sugar and insulin
             </Text>
 
             <View style={styles.inputGroup}>
               <View style={styles.inputLabelContainer}>
-                <MaterialCommunityIcons name="fire" size={18} color="#ef4444" />
+                <Fontisto  name="blood-drop" size={18} color="#a11135ff" />
                 <Text style={styles.inputLabel}>Blood Sugar (mg/dL)</Text>
               </View>
               <TextInput
@@ -140,15 +156,16 @@ export default function EntryScreen() {
                 onChangeText={setBloodSugar}
               />
             </View>
-
+          </View>
+          <View style={styles.card}>
             <View style={styles.inputGroup}>
               <View style={styles.inputLabelContainer}>
-                <Feather name="edit-3" size={18} color="#212529" />
+                <Feather name="edit-3" size={18} color="#0062c4ff" />
                 <Text style={styles.inputLabel}>Insulin Entries</Text>
                 <TouchableOpacity
                   onPress={addInsulinEntry}
                   style={styles.addInsulinButton}>
-                  <Feather name="plus" size={16} color="#212529" />
+                  <FontAwesome6  name="plus" size={16} color="#212529" />
                 </TouchableOpacity>
               </View>
 
@@ -214,7 +231,9 @@ export default function EntryScreen() {
                 </View>
               ))}
             </View>
+          </View>
 
+          <View style={styles.card}>
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Additional Notes</Text>
               <TextInput
@@ -227,20 +246,8 @@ export default function EntryScreen() {
                 onChangeText={setNotes}
               />
             </View>
-
-            <TouchableOpacity
-              style={[
-                styles.submitButton,
-                isSaving && styles.submitButtonDisabled,
-              ]}
-              onPress={handleSubmit}
-              disabled={isSaving}>
-              <Text style={styles.submitButtonText}>
-                {isSaving ? "Saving..." : "Add Entry"}
-              </Text>
-            </TouchableOpacity>
           </View>
-        )}
+        </View>
       </ScrollView>
       <BottomMenu activeScreen="entry" />
     </View>
@@ -251,6 +258,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f0f9ff",
+  },
+  content: {
+    flexDirection: "column",
+    gap: 8,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#212529",
+    textAlign: "center",
+    flex: 1,
   },
   tabContainer: {
     flexDirection: "row",
@@ -287,10 +313,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 12,
-    padding: 20,
+    padding: 16,
     borderWidth: 1,
     borderColor: "#e0f2fe",
-    gap: 18,
+    gap: 12,
   },
   cardHeader: {
     flexDirection: "row",
@@ -329,7 +355,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8fafc",
   },
   textArea: {
-    minHeight: 100,
+    minHeight: 80,
     textAlignVertical: "top",
   },
   addInsulinButton: {
@@ -379,12 +405,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
   },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "bold",
-  },
+  headerAddButton: {
+  backgroundColor: '#212529',
+  paddingVertical: 5,
+  paddingHorizontal: 10,
+  borderRadius: 20,
+},
+headerAddButtonText: {
+  color: 'white',
+  fontSize: 13,
+},
 });

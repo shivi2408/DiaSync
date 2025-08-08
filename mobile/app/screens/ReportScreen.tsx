@@ -12,8 +12,10 @@ import { Picker } from "@react-native-picker/picker";
 import BottomMenu from "../components/BottomMenu";
 import useEntries from "../hooks/useEntries";
 import usePatientData from "../hooks/usePatientData";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ReportScreen() {
+  const navigation = useNavigation();
   const { entries } = useEntries();
   const { patientData } = usePatientData();
   const [selectedMonth, setSelectedMonth] = useState<string>("");
@@ -126,10 +128,16 @@ export default function ReportScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Feather name="file-text" size={20} color="#212529" />
-            <Text style={styles.cardTitle}>Monthly Report</Text>
-          </View>
+          <View style={styles.header}>
+          <TouchableOpacity 
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Feather name="chevron-left" size={24} color="#212529" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Monthly Report</Text>
+          <View style={styles.headerRightPlaceholder} />
+        </View>
 
           <View style={styles.monthSelector}>
             <Feather name="calendar" size={18} color="#212529" />
@@ -176,7 +184,7 @@ export default function ReportScreen() {
               <TouchableOpacity
                 style={styles.downloadButton}
                 onPress={handleDownloadPDF}>
-                <Feather name="download" size={20} color="white" />
+                <Feather name="download" size={18} color="white" />
                 <Text style={styles.downloadButtonText}>
                   Download PDF Report
                 </Text>
@@ -271,6 +279,24 @@ const styles = StyleSheet.create({
     borderColor: "#e0f2fe",
     gap: 20,
   },
+    header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#212529',
+    textAlign: 'center',
+    flex: 1,
+  },
+  headerRightPlaceholder: {
+    width: 40, // Same as back button for balance
+  },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -354,7 +380,7 @@ const styles = StyleSheet.create({
   },
   downloadButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
   tableHeader: {

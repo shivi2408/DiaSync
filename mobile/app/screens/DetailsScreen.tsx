@@ -5,8 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome5 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import usePatientData from "../hooks/usePatientData";
 import BottomMenu from "../components/BottomMenu";
@@ -30,8 +31,8 @@ export default function DetailsScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <Text>Loading...</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#8ec1e2ff" />
       </View>
     );
   }
@@ -39,7 +40,19 @@ export default function DetailsScreen() {
   if (!patientData) {
     return (
       <View style={styles.container}>
-        <Text>No patient data found</Text>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}>
+            <Feather name="chevron-left" size={24} color="#212529" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Patient Information</Text>
+          <View style={styles.editButton} />
+        </View>
+        <View style={styles.noDataContainer}>
+          <Text style={styles.noDataText}>No patient data found</Text>
+        </View>
+        <BottomMenu activeScreen="details" />
       </View>
     );
   }
@@ -48,12 +61,18 @@ export default function DetailsScreen() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}>
+            <Feather name="chevron-left" size={24} color="#212529" />
+          </TouchableOpacity>
           <Text style={styles.title}>Patient Information</Text>
           <TouchableOpacity onPress={editDetails} style={styles.editButton}>
-            <Feather name="edit" size={20} color="#212529" />
+            <FontAwesome5 name="edit" size={22} color="#212529" />
           </TouchableOpacity>
         </View>
 
+        {/* Rest of your existing JSX remains the same */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
           <View style={styles.infoRow}>
@@ -121,7 +140,13 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#f0f9ff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f0f9ff",
   },
   scrollViewContent: {
     padding: 20,
@@ -133,10 +158,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
+  backButton: {
+    padding: 8,
+  },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#2b2b2bff",
+    flex: 1,
+    textAlign: "center",
   },
   editButton: {
     padding: 8,
@@ -187,5 +217,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#7a7f86ff",
     lineHeight: 20,
+  },
+    noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 100, // Account for bottom menu
+  },
+  noDataText: {
+    fontSize: 18,
+    color: '#4b5563',
+    textAlign: 'center',
   },
 });

@@ -1,9 +1,10 @@
 // app/screens/WelcomeScreen.tsx
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import {
-  MaterialCommunityIcons,
-  FontAwesome5,
+  Fontisto ,
+  FontAwesome6 ,
   Feather,
+  SimpleLineIcons 
 } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -33,19 +34,19 @@ export default function WelcomeScreen() {
   if (patientData) {
     return (
       <View style={styles.container}>
-        <View style={styles.mainContent}>
-          <View style={styles.header}>
-            <Image
-              source={require("../../assets/images/adaptive-icon.png")}
-              style={styles.logo}
-            />
-            <Text style={styles.appName}>GlucoBuddy</Text>
-          </View>
-          <View style={styles.content}>
-            <Text style={styles.tagline}>Welcome back!</Text>
-            <Text style={styles.subTagline}>
-              Loading your diabetes care dashboard...
-            </Text>
+        <View style={styles.centeredContent}>
+          <View style={styles.mainContent}>
+            <View style={styles.header}>
+              <Image
+                source={require("../../assets/images/logowithname.png")}
+                style={styles.logo}
+              />
+              {/* <Text style={styles.appName}>GlucoBuddy</Text> */}
+            </View>
+            <View style={styles.content}>
+              <Text style={styles.tagline}>Welcome back!</Text>
+              <ActivityIndicator size="large" color="#8ec1e2ff" />
+            </View>
           </View>
         </View>
       </View>
@@ -55,44 +56,50 @@ export default function WelcomeScreen() {
   // Show the full welcome screen for new users
   return (
     <View style={styles.container}>
-      <View style={styles.mainContent}>
-        <View style={styles.header}>
-          <Image
-            source={require("../../assets/images/adaptive-icon.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.appName}>GlucoBuddy</Text>
-        </View>
-        <View style={styles.content}>
-          <Text style={styles.tagline}>Your assistant in diabetes care</Text>
-          <Text style={styles.subTagline}>
-            Take control of your health together with GlucoBuddy
-          </Text>
-        </View>
-        <View style={styles.features}>
-          <View style={styles.featureItem}>
-            <MaterialCommunityIcons
-              name="chart-line"
-              size={24}
-              color="#212529"
+      <View style={styles.centeredContent}>
+        <View style={styles.mainContent}>
+          <View style={styles.header}>
+            <Image
+              source={require("../../assets/images/logowithname.png")}
+              style={styles.logo}
             />
-            <Text style={styles.featureText}>Track blood sugar levels</Text>
+            {/* <Text style={styles.appName}>GlucoBuddy</Text> */}
           </View>
-          <View style={styles.featureItem}>
-            <FontAwesome5 name="syringe" size={20} color="#212529" />
-            <Text style={styles.featureText}>Record insulin doses</Text>
+          <View style={styles.content}>
+            <Text style={styles.tagline}>Your assistant in diabetes care</Text>
+            <Text style={styles.subTagline}>
+              Take control of your health together with GlucoBuddy
+            </Text>
           </View>
-          <View style={styles.featureItem}>
-            <Feather name="calendar" size={24} color="#212529" />
-            <Text style={styles.featureText}>Monthly reports & PDF export</Text>
+          <View style={styles.features}>
+            <View style={styles.featureItem}>
+              <SimpleLineIcons 
+                name="graph"
+                size={24}
+                color="#212529"
+              />
+              <Text style={styles.featureText}>Track blood sugar levels</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Fontisto  name="injection-syringe" size={22} color="#004488ff" />
+              <Text style={styles.featureText}>Record insulin doses</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <FontAwesome6  name="calendar-check" size={22} color="#212529" />
+              <Text style={styles.featureText}>
+                Monthly reports & PDF export
+              </Text>
+            </View>
           </View>
         </View>
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push("/screens/PatientSetupScreen")}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/screens/PatientSetupScreen")}>
+          <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -102,8 +109,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f0f9ff",
     padding: 32,
-    gap: 20,
-    justifyContent: "space-between",
+  },
+  centeredContent: {
+    flex: 1,
+    justifyContent: "center",
   },
   mainContent: {
     gap: 40,
@@ -113,8 +122,8 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 250,
+    height: 250,
   },
   appName: {
     fontSize: 34,
@@ -153,15 +162,17 @@ const styles = StyleSheet.create({
     color: "#212529",
     fontWeight: "500",
   },
+  buttonContainer: { // Add some padding at the bottom
+  },
   button: {
     backgroundColor: "#212529",
-    padding: 16,
+    padding: 12,
     borderRadius: 50,
     alignItems: "center",
   },
   buttonText: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
