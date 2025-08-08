@@ -28,8 +28,8 @@
         "ACCESS_FINE_LOCATION"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/android_logo.png",
+        "backgroundColor": "transparent"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.shivangi_2408.glucobuddy"

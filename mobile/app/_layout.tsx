@@ -1,12 +1,15 @@
 // app/_layout.tsx
 import { Stack } from 'expo-router';
+import { SafeAreaView } from 'react-native';
 
 export default function RootLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false, // 👈 This hides the default header
-      }}
-    />
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      />
+    </SafeAreaView>
   );
 }
