@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Platform,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
@@ -176,8 +177,20 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   sectionTitle: {
     fontSize: 18,
@@ -218,15 +231,15 @@ const styles = StyleSheet.create({
     color: "#7a7f86ff",
     lineHeight: 20,
   },
-    noDataContainer: {
+  noDataContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingBottom: 100, // Account for bottom menu
   },
   noDataText: {
     fontSize: 18,
-    color: '#4b5563',
-    textAlign: 'center',
+    color: "#4b5563",
+    textAlign: "center",
   },
 });

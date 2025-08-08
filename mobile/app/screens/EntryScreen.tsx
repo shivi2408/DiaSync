@@ -4,11 +4,12 @@ import {
   Text,
   StyleSheet,
   ScrollView,
+  Platform,
   TouchableOpacity,
   TextInput,
   Alert,
 } from "react-native";
-import { Feather, FontAwesome6 ,Fontisto  } from "@expo/vector-icons";
+import { Feather, FontAwesome6, Fontisto } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import BottomMenu from "../components/BottomMenu";
 import Toast from "react-native-toast-message";
@@ -120,22 +121,21 @@ export default function EntryScreen() {
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.content}>
           <View style={styles.header}>
-  <TouchableOpacity
-    onPress={() => navigation.goBack()}
-    style={styles.backButton}>
-    <Feather name="chevron-left" size={24} color="#212529" />
-  </TouchableOpacity>
-  <Text style={styles.headerTitle}>New Entry</Text>
-  <TouchableOpacity 
-    onPress={handleSubmit}
-    style={styles.headerAddButton}
-    disabled={isSaving}
-  >
-    <Text style={styles.headerAddButtonText}>
-      {isSaving ? "Saving..." : "Add"}
-    </Text>
-  </TouchableOpacity>
-</View>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}>
+              <Feather name="chevron-left" size={24} color="#212529" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>New Entry</Text>
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={styles.headerAddButton}
+              disabled={isSaving}>
+              <Text style={styles.headerAddButtonText}>
+                {isSaving ? "Saving..." : "Add"}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.card}>
             <Text style={styles.cardSubtitle}>
@@ -144,7 +144,7 @@ export default function EntryScreen() {
 
             <View style={styles.inputGroup}>
               <View style={styles.inputLabelContainer}>
-                <Fontisto  name="blood-drop" size={18} color="#a11135ff" />
+                <Fontisto name="blood-drop" size={18} color="#a11135ff" />
                 <Text style={styles.inputLabel}>Blood Sugar (mg/dL)</Text>
               </View>
               <TextInput
@@ -165,7 +165,7 @@ export default function EntryScreen() {
                 <TouchableOpacity
                   onPress={addInsulinEntry}
                   style={styles.addInsulinButton}>
-                  <FontAwesome6  name="plus" size={16} color="#212529" />
+                  <FontAwesome6 name="plus" size={16} color="#212529" />
                 </TouchableOpacity>
               </View>
 
@@ -314,9 +314,21 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
-    borderColor: "#e0f2fe",
     gap: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   cardHeader: {
     flexDirection: "row",
@@ -371,6 +383,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e0f2fe",
     gap: 12,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+      web: {
+        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.05)",
+      },
+    }),
   },
   insulinCardHeader: {
     flexDirection: "row",
@@ -406,13 +432,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerAddButton: {
-  backgroundColor: '#212529',
-  paddingVertical: 5,
-  paddingHorizontal: 10,
-  borderRadius: 20,
-},
-headerAddButtonText: {
-  color: 'white',
-  fontSize: 13,
-},
+    backgroundColor: "#212529",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+  },
+  headerAddButtonText: {
+    color: "white",
+    fontSize: 13,
+  },
 });

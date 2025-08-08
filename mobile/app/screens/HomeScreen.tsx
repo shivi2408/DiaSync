@@ -28,6 +28,10 @@ export default function HomeScreen() {
   const { entries, isLoading: isLoadingEntries } = useEntries();
   const [greeting, setGreeting] = useState("Good morning");
   const [location, setLocation] = useState("Permission denied");
+  const currentYear = new Date().getFullYear();
+  const yearsManaged = patientData?.startYear
+    ? currentYear - parseInt(patientData.startYear)
+    : 0;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -50,7 +54,6 @@ export default function HomeScreen() {
         let location = await Location.getCurrentPositionAsync({});
         const { latitude, longitude } = location.coords;
 
-        // Reverse geocode to get city name
         const geocode = await Location.reverseGeocodeAsync({
           latitude,
           longitude,
@@ -78,8 +81,6 @@ export default function HomeScreen() {
   if (!patientData) {
     return (
       <View style={styles.container}>
-
-        {/* Centered no data content */}
         <View style={styles.noDataContainer}>
           <View style={styles.noDataContent}>
             <MaterialCommunityIcons
@@ -102,7 +103,6 @@ export default function HomeScreen() {
     );
   }
 
-  // Calculate today's date
   const todayDate = new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
@@ -127,6 +127,16 @@ export default function HomeScreen() {
           ) / todayEntries.length
         ).toFixed(1)
       : null;
+
+  const bloodSugarStatus = todayAverage
+    ? parseFloat(todayAverage) <
+      parseFloat(patientData?.targetMin?.toString() || "70")
+      ? "Low"
+      : parseFloat(todayAverage) >
+        parseFloat(patientData?.targetMax?.toString() || "130")
+      ? "High"
+      : "Normal"
+    : "No data";
 
   return (
     <View style={styles.container}>
@@ -154,35 +164,46 @@ export default function HomeScreen() {
           </View>
           <View style={styles.dailySummaryGrid}>
             <View style={styles.summaryCard}>
-              <View style={styles.iconContainer}>
-                <View
-                  style={[
-                    styles.iconBackground,
-                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
-                  ]}>
-                  <Fontisto name="blood-drop" size={24} color="#a11135ff" />
-                </View>
+              <View style={styles.summaryHeader}>
+                <Fontisto
+                  name="blood-drop"
+                  size={16}
+                  color="#a11135ff"
+                  style={styles.summaryIcon}
+                />
+                <Text style={styles.summaryLabel}>Blood Sugar</Text>
               </View>
-              <Text style={styles.summaryLabel}>Blood Sugar</Text>
               <Text style={styles.summaryValue}>
                 {todayAverage ? `${todayAverage} mg/dL` : "No data"}
               </Text>
-            </View>
-            <View style={styles.summaryCard}>
-              <View style={styles.iconContainer}>
-                <View
+              <View style={styles.summaryStatusContainer}>
+                <Text
                   style={[
-                    styles.iconBackground,
-                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
+                    styles.summaryStatus,
+                    {
+                      color:
+                        bloodSugarStatus === "High"
+                          ? "#a11135ff"
+                          : bloodSugarStatus === "Low"
+                          ? "#FFA500"
+                          : "#00a15eff",
+                    },
                   ]}>
-                  <Fontisto
-                    name="injection-syringe"
-                    size={24}
-                    color="#01488fff"
-                  />
-                </View>
+                  {bloodSugarStatus}
+                </Text>
               </View>
-              <Text style={styles.summaryLabel}>Today&apos;s Insulin</Text>
+            </View>
+
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryHeader}>
+                <Fontisto
+                  name="injection-syringe"
+                  size={16}
+                  color="#01488fff"
+                  style={styles.summaryIcon}
+                />
+                <Text style={styles.summaryLabel}>Today's Insulin</Text>
+              </View>
               <Text style={styles.summaryValue}>
                 {todayEntries.length > 0
                   ? todayEntries.reduce(
@@ -192,42 +213,49 @@ export default function HomeScreen() {
                   : 0}{" "}
                 doses
               </Text>
-            </View>
-            <View style={styles.summaryCard}>
-              <View style={styles.iconContainer}>
-                <View
-                  style={[
-                    styles.iconBackground,
-                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
-                  ]}>
-                  <MaterialCommunityIcons
-                    name="food-variant"
-                    size={24}
-                    color="#00a15eff"
-                  />
-                </View>
+              <View style={styles.summaryStatusContainer}>
+                <Text style={[styles.summaryStatus, { color: "#00a15eff" }]}>
+                  On track
+                </Text>
               </View>
-              <Text style={styles.summaryLabel}>Diabetes Type</Text>
+            </View>
+
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryHeader}>
+                <MaterialCommunityIcons
+                  name="food-variant"
+                  size={16}
+                  color="#00a15eff"
+                  style={styles.summaryIcon}
+                />
+                <Text style={styles.summaryLabel}>Diabetes Type</Text>
+              </View>
               <Text style={styles.summaryValue}>
-                Type {patientData.diabetesType}
+                Type {patientData?.diabetesType || "Unknown"}
               </Text>
-            </View>
-            <View style={styles.summaryCard}>
-              <View style={styles.iconContainer}>
-                <View
-                  style={[
-                    styles.iconBackground,
-                    { backgroundColor: "rgba(129, 129, 129, 0.1)" },
-                  ]}>
-                  <MaterialCommunityIcons
-                    name="diabetes"
-                    size={24}
-                    color="#aa6000ff"
-                  />
-                </View>
+              <View style={styles.summaryStatusContainer}>
+                <Text style={styles.summaryStatus}>Managed</Text>
               </View>
-              <Text style={styles.summaryLabel}>Diagnosed</Text>
-              <Text style={styles.summaryValue}>{patientData.startYear}</Text>
+            </View>
+
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryHeader}>
+                <MaterialCommunityIcons
+                  name="diabetes"
+                  size={16}
+                  color="#aa6000ff"
+                  style={styles.summaryIcon}
+                />
+                <Text style={styles.summaryLabel}>Diagnosed</Text>
+              </View>
+              <Text style={styles.summaryValue}>
+                {yearsManaged} {yearsManaged === 1 ? "year" : "years"}
+              </Text>
+              <View style={styles.summaryStatusContainer}>
+                <Text style={styles.summaryStatus}>
+                  {patientData?.startYear || "Unknown"}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -245,46 +273,96 @@ export default function HomeScreen() {
 
           {recentEntries.length > 0 ? (
             <View style={styles.entriesContainer}>
-              {recentEntries.map((entry) => (
-                <View key={entry.id} style={styles.entryCard}>
-                  <View style={styles.entryHeader}>
-                    <Text style={styles.entryTime}>
-                      {new Date(entry.date).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </Text>
-                    <Text style={styles.entryBloodSugar}>
-                      {entry.bloodSugar} mg/dL
-                    </Text>
-                  </View>
-                  {entry.insulinEntries.length > 0 && (
-                    <View style={styles.insulinContainer}>
-                      <View style={styles.syringeIconSmall} />
-                      <Text style={styles.insulinText}>
-                        {entry.insulinEntries
-                          .map((ins) => `${ins.type} (${ins.amount}u)`)
-                          .join(", ")}
-                      </Text>
+              {recentEntries.map((entry) => {
+                const entryStatus =
+                  parseFloat(entry.bloodSugar) <
+                  parseFloat(patientData?.targetMin?.toString() || "70")
+                    ? "Low"
+                    : parseFloat(entry.bloodSugar) >
+                      parseFloat(patientData?.targetMax?.toString() || "130")
+                    ? "High"
+                    : "Normal";
+
+                const entryDate = new Date(entry.date);
+                const timeString = entryDate.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+                const dateString = entryDate.toLocaleDateString([], {
+                  month: "short",
+                  day: "numeric",
+                });
+
+                return (
+                  <View key={entry.id} style={styles.entryCard}>
+                    <View style={styles.entryHeader}>
+                      <View>
+                        <Text style={styles.entryDate}>{dateString}</Text>
+                        <Text style={styles.entryTime}>{timeString}</Text>
+                      </View>
+                      <View style={styles.entryBloodSugarContainer}>
+                        <Text
+                          style=
+                            {styles.entryBloodSugar}
+                        >
+                          {entry.bloodSugar} mg/dL
+                        </Text>
+                        <Text
+                          style={[
+                            styles.entryStatus,
+                            {
+                              color:
+                                entryStatus === "High"
+                                  ? "#a11135ff"
+                                  : entryStatus === "Low"
+                                  ? "#FFA500"
+                                  : "#00a15eff",
+                              backgroundColor:
+                                entryStatus === "High"
+                                  ? "#ff9db5ff"
+                                  : entryStatus === "Low"
+                                  ? "#ffe0a7ff"
+                                  : "#c1ffe5ff",
+                            },
+                          ]}>
+                          {entryStatus.toLowerCase()}
+                        </Text>
+                      </View>
                     </View>
-                  )}
-                  {entry.notes && (
-                    <Text style={styles.entryNotes} numberOfLines={2}>
-                      <Feather name="edit-2" size={14} color="#4b5563" />{" "}
-                      {entry.notes}
-                    </Text>
-                  )}
-                </View>
-              ))}
+                    {entry.insulinEntries.length > 0 && (
+                      <View style={styles.insulinContainer}>
+                        <Fontisto
+                          name="injection-syringe"
+                          size={14}
+                          color="#01488fff"
+                        />
+                        <Text style={styles.insulinText}>
+                          {entry.insulinEntries
+                            .map((ins) => `${ins.type} (${ins.amount}u)`)
+                            .join(", ")}
+                        </Text>
+                      </View>
+                    )}
+                    {entry.notes && (
+                      <Text style={styles.entryNotes} numberOfLines={2}>
+                        <Feather name="edit-2" size={14} color="#4b5563" />{" "}
+                        {entry.notes}
+                      </Text>
+                    )}
+                  </View>
+                );
+              })}
             </View>
           ) : (
             <View style={styles.emptyState}>
               <View style={styles.emptyStateIcon} />
               <Text style={styles.emptyStateText}>No entries recorded yet</Text>
-              <TouchableOpacity style={styles.addEntryButton}>
-                <Feather name="plus" size={20} color="white" />
-                <Text style={styles.addEntryButtonText}>Add First Entry</Text>
-              </TouchableOpacity>
+              <Link href="/screens/EntryScreen" asChild>
+                <TouchableOpacity style={styles.addEntryButton}>
+                  <Feather name="plus" size={20} color="white" />
+                  <Text style={styles.addEntryButtonText}>Add First Entry</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           )}
         </View>
@@ -309,7 +387,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 100, // Account for bottom menu
+    paddingBottom: 100,
   },
   noDataContent: {
     alignItems: "center",
@@ -348,7 +426,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     padding: 20,
     gap: 24,
-    paddingBottom: 100, // Space for bottom menu
+    paddingBottom: 100,
   },
   header: {
     flexDirection: "row",
@@ -359,17 +437,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-  },
-  avatar: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    backgroundColor: "#EEF2FF",
-  },
-  avatarText: {
-    fontSize: 22,
-    fontWeight: "600",
-    color: "#212529",
   },
   greeting: {
     fontSize: 16,
@@ -426,10 +493,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   viewAll: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#838383ff",
-    fontWeight: "600",
-    textDecorationLine: "underline",
+    fontWeight: "500",
   },
   dailySummaryGrid: {
     flexDirection: "row",
@@ -442,7 +508,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     width: "48%",
-    alignItems: "center",
     gap: 8,
     ...Platform.select({
       ios: {
@@ -459,31 +524,40 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  iconContainer: {},
-  iconBackground: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: "center",
+  summaryHeader: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: 8,
   },
-
+  summaryIcon: {
+    width: 24,
+    textAlign: "center",
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: "#6B7280",
+    fontWeight: "500",
+  },
+  summaryValue: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#111827",
+  },
+  summaryStatusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  summaryStatus: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontWeight: "500",
+  },
   syringeIconSmall: {
     width: 13,
     height: 13,
     backgroundColor: "#c1e6ffff",
     borderRadius: 2,
-  },
-  summaryLabel: {
-    fontSize: 14,
-    color: "#6B7280",
-    textAlign: "center",
-  },
-  summaryValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
-    textAlign: "center",
   },
   emptyState: {
     backgroundColor: "white",
@@ -556,11 +630,28 @@ const styles = StyleSheet.create({
   entryHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+  },
+  entryDate: {
+    fontSize: 12,
+    color: "#6B7280",
   },
   entryTime: {
     fontSize: 16,
     color: "#6B7280",
     fontWeight: "500",
+  },
+  entryBloodSugarContainer: {
+    alignItems: "flex-end",
+    gap:8
+  },
+  entryStatus: {
+    fontSize: 12,
+    fontWeight: "500",
+    textTransform: "capitalize",
+    paddingHorizontal: 6,
+    paddingVertical:2,
+    borderRadius:50
   },
   entryBloodSugar: {
     fontSize: 16,
@@ -580,79 +671,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
     fontStyle: "italic",
-  },
-  bottomMenu: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "white",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === "ios" ? 28 : 12,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 8,
-      },
-      web: {
-        boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
-      },
-    }),
-  },
-  menuItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  menuItemContent: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  menuIconContainer: {
-    width: 24,
-    height: 24,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  homeIcon: {
-    width: 20,
-    height: 20,
-    backgroundColor: "#212529",
-    borderRadius: 4,
-  },
-  statsIcon: {
-    width: 20,
-    height: 20,
-    backgroundColor: "#9CA3AF",
-    borderRadius: 4,
-  },
-  settingsIcon: {
-    width: 20,
-    height: 20,
-    backgroundColor: "#9CA3AF",
-    borderRadius: 4,
-  },
-  menuText: {
-    fontSize: 12,
-    color: "#9CA3AF",
-  },
-  activeMenuItem: {
-    backgroundColor: "rgba(129, 129, 129, 0.1)",
-    borderRadius: 12,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  activeMenuText: {
-    color: "#212529",
-    fontWeight: "600",
   },
 });
