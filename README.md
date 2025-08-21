@@ -32,14 +32,14 @@
 
 ## 📷 Screenshots *(Coming Soon)*
 
-*(Add UI mockups or app screenshots here once available)*
+*( UI mockups or app screenshots will be added here once available)*
 
 ---
 
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/shivi2408/DiaSync.git
+git clone https://github.com/shivi2408/GlucoBuddy.git
 cd glucobuddy
 npm install
 npx expo start
